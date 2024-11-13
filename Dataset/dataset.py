@@ -11,6 +11,8 @@ import albumentations as A
 import argparse
 import matplotlib.pyplot as plt
 import matplotlib
+from typing import Callable
+
 
 
 def load_config(config_path : str) -> dict:
@@ -53,7 +55,7 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
     return images, labels
 
 
-def get_transforms(augmentations_config : dict):
+def get_transforms(augmentations_config : dict) -> Callable:
     transforms_list = []
     for aug in augmentations_config:
         if isinstance(aug, dict):
@@ -212,7 +214,7 @@ if __name__ == "__main__":
     ]
 
     # 시각화 함수입니다. 클래스가 2개 이상인 픽셀을 고려하지는 않습니다.
-    def label2rgb(label):
+    def label2rgb(label) -> list:
         image_size = label.shape[1:] + (3, )
         image = np.zeros(image_size, dtype=np.uint8)
         
