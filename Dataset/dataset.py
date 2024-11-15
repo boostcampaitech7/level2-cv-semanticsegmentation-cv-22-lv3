@@ -1,17 +1,16 @@
 import yaml
 import os
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import numpy as np
 from sklearn.model_selection import GroupKFold
 import cv2
 import json
 import torch
 import albumentations as A
-import albumentations as A
 import argparse
 import matplotlib.pyplot as plt
-import matplotlib
-from typing import Callable
+from transform import get_transforms
+from split_dataset.splitdata import split_data
 
 
 
@@ -55,63 +54,48 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
     return images, labels
 
 
-def get_transforms(augmentations_config : dict) -> Callable:
-    transforms_list = []
-    for aug in augmentations_config:
-        if isinstance(aug, dict):
-            for aug_name, aug_params in aug.items():
-                try:
-                    # Albumentations에서 해당 증강 클래스 가져오기
-                    aug_class = getattr(A, aug_name)
-                    if aug_params is None:
-                        transforms_list.append(aug_class())
-                    else:
-                        transforms_list.append(aug_class(**aug_params))
-                except AttributeError:
-                    print(f"Albumentations에 '{aug_name}' 증강이 존재하지 않습니다.")
-        else:
-            # 파라미터 없이 증강 이름만 지정한 경우
-            try:
-                aug_class = getattr(A, aug)
-                transforms_list.append(aug_class())
-            except AttributeError:
-                print(f"Albumentations에 '{aug}' 증강이 존재하지 않습니다.")
-    return A.Compose(transforms_list)
-
+def load_test_images(config):
+            test_data_path = config['data']['test_data_path']
+            images = sorted([
+                os.path.relpath(os.path.join(root, fname), start=test_data_path)
+                for root, _, files in os.walk(test_data_path)
+                for fname in files
+                if os.path.splitext(fname)[1].lower() == '.png'
+            ])
+            return images, test_data_path
 
 
 class XRayDataset(Dataset):
-    def __init__ (self, is_train = True, transforms=None, config=None):
-        images, labels = check_image_label_pair(config)
-        _imagenames = np.array(images)
-        _labelnames = np.array(labels)
+    def __init__ (self, mode='train', transforms=None, config=None):
+
+        if mode == 'train' or mode == 'val' : 
+            images, labels = check_image_label_pair(config)
+            _imagenames = np.array(images)
+            _labelnames = np.array(labels)
+
+        else:
+            images, labels = load_test_images(config)
+            _imagenames = np.array(images)
+            _labelnames = np.array(images)
 
 
         # 한 사람의 왼손, 오른손을 하나의 그룹으로 묶어준다.
         left_right_group = [os.path.dirname(fname) for fname in _imagenames]
-        # groupfold를 위한 더미 데이터 ( 파라미터를 맞춰주기 위함 )
-        dummy_for_groupfold = [0 for _ in _imagenames]
 
-        groupKFold = GroupKFold(n_splits = 5)
 
-        imagenames = []
-        labelnames = []
+        imagenames, labelnames = split_data(
+            _imagenames, _labelnames, left_right_group,
+            config=config, mode=mode,
+            split_method=config['data'].get('split_method', 'GroupKFold')
+        )
 
-        for i, (x,y) in enumerate(groupKFold.split(_imagenames, dummy_for_groupfold, left_right_group)):
-            if is_train:
-                if i == 0 :
-                    continue
-                else:
-                    imagenames += list(_imagenames[y])
-                    labelnames += list(_labelnames[y])
+        
 
-            else:
-                imagenames += list(_imagenames[y])
-                labelnames += list(_labelnames[y])
+
 
         self.imagenames = imagenames
         self.labelnames = labelnames
-        self.is_train = is_train
+        self.mode = mode
         self.transforms = transforms
         self.config = config
 
@@ -121,57 +105,68 @@ class XRayDataset(Dataset):
 
     def __getitem__(self, item : int) -> tuple[list[float], list[float]]:
         image_name = self.imagenames[item]
-        image_path = os.path.join(self.config['data']['train_data_path'], image_name)
 
-        image = cv2.imread(image_path)
-        # image = image / 255 
-
-        label_name = self.labelnames[item]
-        label_path = os.path.join(self.config['data']['train_label_path'], label_name)
-        
-        # 라벨의 형태를 생성한다 : 이미지의 높이와 넓이 + 클래스 수 의 형태로 만든들고, 모두 0으로 만들어준다 ( H, W, Class)
-        label_shape = tuple(image.shape[:2]) + (len(self.config['data']['class']),)        
-        label = np.zeros(label_shape, dtype = np.uint8)
-
-        # label의 annotation 정보를 가지고 온다.
-        with open(label_path , 'r') as f:
-            annotations = json.load(f)
-        annotations = annotations['annotations']
-        
-        CLASS2IND = {v: i for i , v in enumerate(self.config['data']['class'])}
-        IND2CLASS = {v: k for k , v in CLASS2IND.items()}
-
-        for ann in annotations:
-            c = ann['label']
-            class_id = CLASS2IND[c]
-            points = np.array(ann['points'])
-
-            # polygone type을 mask type으로 변경하는 코드를 작성합니다.
-            class_label = np.zeros(image.shape[:2], dtype = np.uint8)
-            cv2.fillPoly(class_label, [points], 1)
-            label[..., class_id] = class_label
-
-        
-        if self.transforms is not None:
-            if self.is_train:
-                inputs = {'image': image, 'mask': label}
-                result = self.transforms(**inputs)
-                image = result['image']
-                label = result['mask']
-            else:
+        if self.mode == 'test':
+            image_path = os.path.join(self.config['data']['test_data_path'], image_name)
+            image = cv2.imread(image_path)
+            # 필요한 전처리 적용
+            if self.transforms is not None:
                 inputs = {'image': image}
                 result = self.transforms(**inputs)
                 image = result['image']
 
-    
-        image = image.transpose(2, 0, 1)
-        label = label.transpose(2, 0, 1)
+            image = image.transpose(2, 0, 1)
+            image = torch.from_numpy(image).float()
+            return image, image_name 
 
-        image = torch.from_numpy(image).float()
-        label = torch.from_numpy(label).float()
 
-        return image, label
+        else:
+            image_path = os.path.join(self.config['data']['train_data_path'], image_name)
 
+            image = cv2.imread(image_path)
+            # image = image / 255 
+
+            label_name = self.labelnames[item]
+            label_path = os.path.join(self.config['data']['train_label_path'], label_name)
+            
+            # 라벨의 형태를 생성한다 : 이미지의 높이와 넓이 + 클래스 수 의 형태로 만든들고, 모두 0으로 만들어준다 ( H, W, Class)
+            label_shape = tuple(image.shape[:2]) + (len(self.config['data']['class']),)        
+            label = np.zeros(label_shape, dtype = np.uint8)
+
+            # label의 annotation 정보를 가지고 온다.
+            with open(label_path , 'r') as f:
+                annotations = json.load(f)
+            annotations = annotations['annotations']
+            
+            CLASS2IND = {v: i for i , v in enumerate(self.config['data']['class'])}
+            IND2CLASS = {v: k for k , v in CLASS2IND.items()}
+
+            for ann in annotations:
+                c = ann['label']
+                class_id = CLASS2IND[c]
+                points = np.array(ann['points'])
+
+                # polygone type을 mask type으로 변경하는 코드를 작성합니다.
+                class_label = np.zeros(image.shape[:2], dtype = np.uint8)
+                cv2.fillPoly(class_label, [points], 1)
+                label[..., class_id] = class_label
+
+            
+            if self.transforms is not None:
+                inputs = {'image': image, 'mask': label}
+                result = self.transforms(**inputs)
+                image = result['image']
+                label = result['mask']
+                
+
+        
+            image = image.transpose(2, 0, 1)
+            label = label.transpose(2, 0, 1)
+
+            image = torch.from_numpy(image).float()
+            label = torch.from_numpy(label).float()
+
+            return image, label
 
 
 
@@ -193,8 +188,8 @@ if __name__ == "__main__":
     valid_transforms = get_transforms(valid_transforms_config)
 
     # 데이터셋 생성
-    train_dataset = XRayDataset(is_train=True, transforms=train_transforms, config=config)
-    valid_dataset = XRayDataset(is_train=False, transforms=valid_transforms, config=config)
+    train_dataset = XRayDataset(mode='train', transforms=train_transforms, config=config)
+    valid_dataset = XRayDataset(mode='val', transforms=valid_transforms, config=config)
 
     # 데이터셋 사용 예시
     image, label = train_dataset[0]
@@ -213,7 +208,7 @@ if __name__ == "__main__":
         (0, 125, 92), (209, 0, 151), (188, 208, 182), (0, 220, 176),
     ]
 
-    # 시각화 함수입니다. 클래스가 2개 이상인 픽셀을 고려하지는 않습니다.
+
     def label2rgb(label) -> list:
         image_size = label.shape[1:] + (3, )
         image = np.zeros(image_size, dtype=np.uint8)
@@ -224,7 +219,7 @@ if __name__ == "__main__":
         return image
 
     fig, ax = plt.subplots(1, 2, figsize=(24, 12))
-    ax[0].imshow(image[0])    # color map 적용을 위해 channel 차원을 생략합니다.
+    ax[0].imshow(image[0])    
     ax[1].imshow(label2rgb(label))
 
     plt.show()
