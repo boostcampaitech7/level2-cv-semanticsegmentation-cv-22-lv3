@@ -21,7 +21,7 @@ data :
     num_workers : 2
     pin_memory : True
   
-  val : 
+  valid : 
     batch_size : 4
     suffle : True
     num_workers : 2
