@@ -11,6 +11,7 @@ import argparse
 import matplotlib.pyplot as plt
 from transform import get_transforms
 from split_dataset.splitdata import split_data
+from typing import Dict, Any, Tuple
 
 
 
@@ -67,37 +68,46 @@ def load_test_images(config):
 
 class XRayDataset(Dataset):
     def __init__ (self, mode='train', transforms=None, config=None):
+        self.mode = mode
+        self.transforms = transforms
+        self.config = config
 
-        if mode == 'train' or mode == 'val' : 
+        if mode in ['train', 'val']:
+            # Train 및 Validation 모드: 이미지와 라벨 로드
             images, labels = check_image_label_pair(config)
             _imagenames = np.array(images)
             _labelnames = np.array(labels)
 
+            # 그룹 정보 생성 (예: 한 사람의 왼손, 오른손을 하나의 그룹으로)
+            left_right_group = [os.path.dirname(fname) for fname in _imagenames]
+
+            # 데이터 분할
+            imagenames, labelnames = split_data(
+                _imagenames, _labelnames, left_right_group,
+                config=config, mode=mode,
+                split_method=config['data'].get('split_method', 'GroupKFold')
+            )
+
+            self.imagenames = imagenames
+            self.labelnames = labelnames
+
+        elif mode == 'test':
+            # Test 모드: 테스트 이미지 로드
+            self.imagenames, self.test_data_path = self.load_test_images(config)
+            self.labelnames = []  # Test 데이터는 라벨이 없음
+
         else:
-            images, labels = load_test_images(config)
-            _imagenames = np.array(images)
-            _labelnames = np.array(images)
+            raise ValueError("Invalid mode. Choose 'train', 'val', or 'test'.")
 
-
-        # 한 사람의 왼손, 오른손을 하나의 그룹으로 묶어준다.
-        left_right_group = [os.path.dirname(fname) for fname in _imagenames]
-
-
-        imagenames, labelnames = split_data(
-            _imagenames, _labelnames, left_right_group,
-            config=config, mode=mode,
-            split_method=config['data'].get('split_method', 'GroupKFold')
-        )
-
-        
-
-
-
-        self.imagenames = imagenames
-        self.labelnames = labelnames
-        self.mode = mode
-        self.transforms = transforms
-        self.config = config
+    def load_test_images(self, config: Dict[str, Any]) -> Tuple[list, str]:
+        test_data_path = config['data']['test_data_path']
+        images = sorted([
+            os.path.relpath(os.path.join(root, fname), start=test_data_path)
+            for root, _, files in os.walk(test_data_path)
+            for fname in files
+            if os.path.splitext(fname)[1].lower() == '.png'
+        ])
+        return images, test_data_path
 
     def __len__(self) -> int:
         return len(self.imagenames)

@@ -36,10 +36,10 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
 
     val_loader = DataLoader(
         dataset = val_datasets,
-        batch_size = config['data']['val']['batch_size'],
-        shuffle = config['data']['val']['suffle'],
-        num_workers = config['data']['val']['num_workers'],
-        pin_memory = config['data']['val']['pin_memory']
+        batch_size = config['data']['valid']['batch_size'],
+        shuffle = config['data']['valid']['suffle'],
+        num_workers = config['data']['valid']['num_workers'],
+        pin_memory = config['data']['valid']['pin_memory']
     )
 
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # Test loader
     test_loader = get_test_loader(config)
 
-    # Train loader 확인 ( 첫배치만 확인하고 break )
+    # Train loader 확인 ( 첫 배치만 확인하고 break )
     print("Checking train loader...")
     for images, labels in train_loader:
         print(f"Train batch - images shape: {images.shape}, labels shape: {labels.shape}")
@@ -96,3 +96,21 @@ if __name__ == "__main__":
     for images, image_names in test_loader:
         print(f"Test batch - images shape: {images.shape}, image names: {image_names}")
         break  
+
+    # 추가: 데이터셋 총 개수 출력
+    print("\nDataset counts:")
+    print(f"Train dataset size: {len(train_loader.dataset)}")
+    print(f"Validation dataset size: {len(val_loader.dataset)}")
+    print(f"Test dataset size: {len(test_loader.dataset)}")
+
+    # 추가: Train과 Validation 데이터셋의 중복 여부 확인
+    train_images = set(train_loader.dataset.imagenames)
+    val_images = set(val_loader.dataset.imagenames)
+    overlap = train_images.intersection(val_images)
+    if not overlap:
+        print("Train and Validation datasets do not overlap.")
+    else:
+        print(f"Overlap between Train and Validation datasets: {overlap}")
+
+    # 추가: Test 데이터셋 총 개수 확인 (이미 위에서 출력됨)
+    print(f"Total test images loaded: {len(test_loader.dataset)}")
