@@ -18,10 +18,11 @@ def get_transforms(augmentations_config : dict) -> Callable:
                 except AttributeError:
                     print(f"Albumentations에 '{aug_name}' 증강이 존재하지 않습니다.")
         else:
-            # 파라미터 없이 증강 이름만 지정한 경우
+            
             try:
                 aug_class = getattr(A, aug)
                 transforms_list.append(aug_class())
             except AttributeError:
                 print(f"Albumentations에 '{aug}' 증강이 존재하지 않습니다.")
+                
     return A.Compose(transforms_list)

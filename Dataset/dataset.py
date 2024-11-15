@@ -18,6 +18,7 @@ from typing import Dict, Any, Tuple
 def load_config(config_path : str) -> dict:
     with open(config_path, 'r') as data_config :
         data_config = yaml.safe_load(data_config)
+        
     return data_config
 
 
@@ -63,6 +64,7 @@ def load_test_images(config):
                 for fname in files
                 if os.path.splitext(fname)[1].lower() == '.png'
             ])
+
             return images, test_data_path
 
 
@@ -107,9 +109,11 @@ class XRayDataset(Dataset):
             for fname in files
             if os.path.splitext(fname)[1].lower() == '.png'
         ])
+
         return images, test_data_path
 
     def __len__(self) -> int:
+
         return len(self.imagenames)
     
 
@@ -127,6 +131,7 @@ class XRayDataset(Dataset):
 
             image = image.transpose(2, 0, 1)
             image = torch.from_numpy(image).float()
+
             return image, image_name 
 
 
@@ -177,8 +182,7 @@ class XRayDataset(Dataset):
             label = torch.from_numpy(label).float()
 
             return image, label
-
-
+        
 
 if __name__ == "__main__":
     # argparse를 사용하여 명령줄 인자 파싱

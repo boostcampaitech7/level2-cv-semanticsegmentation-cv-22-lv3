@@ -33,8 +33,6 @@ data :
     num_workers : 2
     pin_memory : True
   
-  
-
 
 augmentation:
   train:

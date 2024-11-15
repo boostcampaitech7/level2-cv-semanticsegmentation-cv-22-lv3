@@ -42,7 +42,6 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         pin_memory = config['data']['valid']['pin_memory']
     )
 
-
     return train_loader, val_loader
 
 
