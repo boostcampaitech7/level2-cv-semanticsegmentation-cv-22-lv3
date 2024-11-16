@@ -1,0 +1,4 @@
+library: 'torchvision'
+model_name: 'lraspp_mobilenet_v3_large'
+num_classes: 29
+pretrained: True

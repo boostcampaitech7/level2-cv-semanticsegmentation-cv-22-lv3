@@ -1,0 +1,4 @@
+library: 'torchvision'
+model_name: 'fcn_resnet101'
+num_classes: 29
+pretrained: True
