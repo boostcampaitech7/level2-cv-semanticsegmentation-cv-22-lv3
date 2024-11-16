@@ -79,6 +79,7 @@ def validation(epoch, model, data_loader, criterion, config=None):
 
 # trainer
 def train(model, train_loader, val_loader, criterion, optimizer, config):
+    print(f'max_epoch: {config.train.max_epoch}, valid & save_interval: {config.val.interval}')
     print(f'Start training..')
 
     config = config
@@ -115,7 +116,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                     f'Loss: {round(loss.item(),4)}'
                 )
              
-        # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
+        # validation 주기에 따라 loss를 출력 및 checkpoint 저장하고 best model을 저장합니다.
         if (epoch + 1) % config.val.interval == 0:
             dice = validation(epoch + 1, model, val_loader, criterion, config=config)
 

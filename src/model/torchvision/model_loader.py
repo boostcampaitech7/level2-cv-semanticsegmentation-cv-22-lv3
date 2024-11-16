@@ -22,7 +22,7 @@ def model_loader(config):
     # Config 값 가져오기
     library = config.library  # 'library' 키의 값
     model_name = config.model_name  # 'model_name' 키의 값
-    num_classes = config.num_classes  # 'num_classes' 키의 값
+    num_classes = len(config.data.classes)  # 'data.classes' 키의 값들의 길이
 
     # Optional 값 처리
     pretrained = getattr(config, 'pretrained', True)  # default: True
