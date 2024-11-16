@@ -69,11 +69,13 @@ train:
   classes: 29
   batch_size: 8
   max_epoch: 20
+  print_step: 25
 val:
   batch_size: 4
   interval: 5
+  threshold: 0.5
 
-save_dir: ./checkpoints/basemodel
+save_dir: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel
 
 seed: 42
 
@@ -85,11 +87,11 @@ optimizer:
   weight_decay: 1e-6
 
 # 디버깅 모드
-debug: False
+debug: True
+
 
 
 library: 'torchvision'
 model_name: 'fcn_resnet50'
 num_classes: 29
 pretrained: True
-
