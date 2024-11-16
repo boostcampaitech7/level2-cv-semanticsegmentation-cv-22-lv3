@@ -86,3 +86,10 @@ optimizer:
 
 # 디버깅 모드
 debug: False
+
+
+library: 'torchvision'
+model_name: 'fcn_resnet50'
+num_classes: 29
+pretrained: True
+

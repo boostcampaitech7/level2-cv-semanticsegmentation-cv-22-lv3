@@ -7,16 +7,16 @@ from omegaconf import OmegaConf
 import argparse
 import torch
 import numpy as np
-
+from model.torchvision.model_loader import model_loader
 
 def do_train(cfg):
     if cfg.debug:
         cfg.train.max_epoch = 2
         cfg.val.interval = 1
 
-    model = models.segmentation.fcn_resnet50(pretrained=True)
-
-    model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
+    # model = models.segmentation.fcn_resnet50(pretrained=True)
+    # model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
+    model = model_loader(cfg)
 
     # Loss function을 정의합니다.
     criterion = nn.BCEWithLogitsLoss()
