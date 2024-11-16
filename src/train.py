@@ -8,24 +8,24 @@ import argparse
 import torch
 import numpy as np
 from model.torchvision.model_loader import model_loader
+from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
+
 
 def do_train(cfg):
     if cfg.debug:
         cfg.train.max_epoch = 2
         cfg.val.interval = 1
 
-    # model = models.segmentation.fcn_resnet50(pretrained=True)
-    # model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
     model = model_loader(cfg)
 
     # Loss function 선택
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = loss_func_loader(cfg.loss_name)
 
     # Optimizer 선택
-    optimizer = optim.Adam(params=model.parameters(), lr=cfg.optimizer.lr, weight_decay=cfg.optimizer.weight_decay)
+    optimizer = optimizer_loader(cfg, model.parameters())
 
     # Scheduler 선택
-    
+
 
     # 시드를 설정합니다.
     set_seed(cfg.seed)
@@ -41,7 +41,9 @@ if __name__ == "__main__":
     # argparse를 사용하여 명령줄 인자 파싱
     parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
     # parser.add_argument('--config_train', type=str, default='configs/train/base_train.yaml', help='Path to the train config file')
-    parser.add_argument('--config', type=str, default='../configs/base_config.yaml', help='Path to the data config file')
+    parser.add_argument('--config', type=str, 
+                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/base_config.yaml', 
+                        help='Path to the data config file')
 
     args = parser.parse_args()
 
