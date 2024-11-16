@@ -1,0 +1,2 @@
+encoder_name: "mit_b4"
+encoder_weights: "imagenet"

@@ -1,4 +1,0 @@
-library: 'torchvision'
-model_name: 'deeplabv3_resnet101'
-num_classes: 29
-pretrained: True

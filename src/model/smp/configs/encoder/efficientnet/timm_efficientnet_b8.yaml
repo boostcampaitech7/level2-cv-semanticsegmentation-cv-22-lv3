@@ -1,0 +1,2 @@
+encoder_name: "timm-efficientnet-b8"
+encoder_weights: "imagenet"

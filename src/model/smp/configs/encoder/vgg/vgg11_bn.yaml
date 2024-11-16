@@ -1,0 +1,2 @@
+encoder_name: "vgg11_bn"
+encoder_weights: "imagenet"

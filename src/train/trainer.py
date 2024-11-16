@@ -4,7 +4,7 @@ import numpy as np
 from tqdm.auto import tqdm
 import datetime
 from omegaconf import OmegaConf
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Optional
 import argparse
 
 import torch
@@ -12,7 +12,24 @@ import torch.nn.functional as F
 
 from utils.metrics import dice_coef
 
+def load_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, save_path: Optional[str] = None) -> str:
+    # Load configurations
+    base_config = OmegaConf.load(base_config)
+    model_config = OmegaConf.load(model_config)
 
+    # Conditionally merge encoder configuration
+    if encoder_config is not None:
+        encoder_config = OmegaConf.load(encoder_config)
+        merged_config = OmegaConf.merge(base_config, model_config, encoder_config)
+    else:
+        merged_config = OmegaConf.merge(base_config, model_config)
+
+    # Save configuration if save_path is provided
+    if save_path:
+        OmegaConf.save(merged_config, save_path)
+
+    # Return merged configuration and save path
+    return merged_config
 
 def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
     output_path = os.path.join(config.save_dir, file_name)
@@ -28,6 +45,11 @@ def set_seed(seed):
     np.random.seed(seed)
     random.seed(seed)
 
+def get_model_output(model, library, input):
+    if library == 'smp':
+        return model(input)
+    else:
+        return model(input)['out']
 
 # valid set test
 def validation(epoch, model, data_loader, criterion, config=None):
@@ -44,7 +66,8 @@ def validation(epoch, model, data_loader, criterion, config=None):
             images, masks = images.cuda(), masks.cuda()         
             model = model.cuda()
             
-            outputs = model(images)['out']
+            # library 인자 수정하기
+            outputs = get_model_output(model, config.model.library, images)
             
             output_h, output_w = outputs.size(-2), outputs.size(-1)
             mask_h, mask_w = masks.size(-2), masks.size(-1)
@@ -99,8 +122,9 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
             images, masks = images.cuda(), masks.cuda()
             model = model.cuda()
             
-            outputs = model(images)['out']
-            
+            # library 인자 수정하기
+            outputs = get_model_output(model, config.model.library, images)
+
             # loss를 계산합니다.
             loss = criterion(outputs, masks)
             optimizer.zero_grad()

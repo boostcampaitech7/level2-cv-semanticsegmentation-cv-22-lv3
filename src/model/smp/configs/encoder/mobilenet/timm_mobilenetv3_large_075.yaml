@@ -1,0 +1,2 @@
+encoder_name: "timm-mobilenetv3_large_075"
+encoder_weights: "imagenet"

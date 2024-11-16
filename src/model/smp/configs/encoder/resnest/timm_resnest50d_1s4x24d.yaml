@@ -1,0 +1,2 @@
+encoder_name: "timm-resnest50d_1s4x24d"
+encoder_weights: "imagenet"
