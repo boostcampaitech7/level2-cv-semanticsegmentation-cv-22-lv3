@@ -78,16 +78,16 @@ def validation(epoch, model, data_loader, criterion, thr=0.5, config=None):
     return avg_dice
 
 # trainer
-def train(model, train_loader, val_loader, criterion, optimizer, config_data):
+def train(model, train_loader, val_loader, criterion, optimizer, config):
     print(f'Start training..')
 
-    config_data = config_data
-    config_data = config_data
+    config = config
+
     
-    n_class = len(config_data.data.classes)
+    n_class = len(config.data.classes)
     best_dice = 0.
     
-    for epoch in range(config_data.train.max_epoch):
+    for epoch in range(config.train.max_epoch):
         model.train()
 
         for step, (images, masks) in enumerate(train_loader):            
@@ -107,19 +107,19 @@ def train(model, train_loader, val_loader, criterion, optimizer, config_data):
             if (step + 1) % 25 == 0:
                 print(
                     f'{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | '
-                    f'Epoch [{epoch+1}/{config_data.train.max_epoch}], '
+                    f'Epoch [{epoch+1}/{config.train.max_epoch}], '
                     f'Step [{step+1}/{len(train_loader)}], '
                     f'Loss: {round(loss.item(),4)}'
                 )
              
         # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
-        if (epoch + 1) % config_data.val.interval == 0:
-            dice = validation(epoch + 1, model, val_loader, criterion, config=config_data)
+        if (epoch + 1) % config.val.interval == 0:
+            dice = validation(epoch + 1, model, val_loader, criterion, config=config)
             
             if best_dice < dice:
                 print(f"Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
-                print(f"Save model in {config_data.save_dir}")
+                print(f"Save model in {config.save_dir}")
                 best_dice = dice
-                save_model(model,config_data)
+                save_model(model,config)
 
 

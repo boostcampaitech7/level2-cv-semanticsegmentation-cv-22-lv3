@@ -29,8 +29,8 @@ def do_train(cfg_data):
     
     train_loader, val_loader = get_train_val_loader(cfg_data)
 
-    # train(model, train_loader, val_loader, criterion, optimizer, config_train, config_data)
-    train(model, train_loader, val_loader, criterion, optimizer, config_data)
+    # train(model, train_loader, val_loader, criterion, optimizer, config_train, config)
+    train(model, train_loader, val_loader, criterion, optimizer, config)
 
 
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # 설정 파일 로드
     # config_train = OmegaConf.load(args.config_train)
-    config_data = OmegaConf.load(args.config_data)
+    config = OmegaConf.load(args.config)
 
-    # do_train(config_train, config_data)
-    do_train(config_data)
+    # do_train(config_train, config)
+    do_train(config)
