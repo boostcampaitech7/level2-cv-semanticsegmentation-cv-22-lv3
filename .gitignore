@@ -1,0 +1,9 @@
+*.png
+*.json
+wandb
+checkpoints
+*.csv
+*.log
+*.ipynb
+baseline_code.py
+__pycache__
