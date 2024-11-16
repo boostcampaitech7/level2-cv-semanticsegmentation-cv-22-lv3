@@ -20,18 +20,21 @@ data :
     shuffle : True
     num_workers : 2
     pin_memory : True
+    drop_last : True
   
   valid : 
     batch_size : 4
-    shuffle : True
+    shuffle : False
     num_workers : 2
     pin_memory : True
+    drop_last : False
   
   test : 
     batch_size : 4
-    shuffle : True
+    shuffle : False
     num_workers : 2
     pin_memory : True
+    drop_last : False
   
 
 augmentation:
@@ -63,16 +66,19 @@ augmentation:
     - Resize:
         height: 512
         width: 512
+    - Normalize:
+        mean: [0.485, 0.456, 0.406]
+        std: [0.229, 0.224, 0.225]
 
 
 train:
   classes: 29
   batch_size: 8
-  max_epoch: 20
-  print_step: 25
+  max_epoch: 10
+  print_step: 20
 val:
   batch_size: 4
-  interval: 5
+  interval: 1
   threshold: 0.5
 
 save_dir: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel
@@ -87,10 +93,16 @@ optimizer:
   weight_decay: 1e-6
 
 # 디버깅 모드
-debug: True
+debug: False
 
 
 
 library: 'torchvision'
 model_name: 'fcn_resnet50'
 pretrained: True
+
+inference:
+  threshold: 0.5
+  output_size: [2048, 2048]  # 튜플을 리스트로 수정
+  checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel/epoch_3_model.pt"  # .ckpt에서 .pt로 수정
+  output_dir: "../results"
