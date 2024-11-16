@@ -4,7 +4,6 @@ wandb
 checkpoints
 *.csv
 *.log
-*.ipynb
 baseline_code.py
 __pycache__
 *.__pycache__
