@@ -121,6 +121,8 @@ class XRayDataset(Dataset):
         if self.mode == 'test':
             image_path = os.path.join(self.config.data.test_data_path, image_name)
             image = cv2.imread(image_path)
+            image = image / 255.
+
             # 필요한 전처리 적용
             if self.transforms is not None:
                 inputs = {'image': image}
@@ -137,7 +139,7 @@ class XRayDataset(Dataset):
             image_path = os.path.join(self.config.data.train_data_path, image_name)
 
             image = cv2.imread(image_path)
-            # image = image / 255 
+            image = image / 255 
 
             label_name = self.labelnames[item]
             label_path = os.path.join(self.config.data.train_label_path, label_name)
