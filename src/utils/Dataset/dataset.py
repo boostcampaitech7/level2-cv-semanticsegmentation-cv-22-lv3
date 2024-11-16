@@ -2,15 +2,14 @@ import yaml
 import os
 from torch.utils.data import Dataset
 import numpy as np
-from sklearn.model_selection import GroupKFold
 import cv2
 import json
 import torch
 import albumentations as A
 import argparse
 import matplotlib.pyplot as plt
-from .transform import get_transforms
-from .split_dataset.splitdata import split_data
+from utils.Dataset.transform import get_transforms
+from utils.Dataset.split_dataset.splitdata import split_data
 from typing import Dict, Any, Tuple
 from omegaconf import OmegaConf
 
@@ -88,8 +87,13 @@ class XRayDataset(Dataset):
                 split_method=config.data.get('split_method', 'GroupKFold')
             )
 
-            self.imagenames = imagenames
-            self.labelnames = labelnames
+            if config.debug == False :
+                self.imagenames = imagenames
+                self.labelnames = labelnames
+
+            elif config.debug == True :
+                self.imagenames = images[ : 30]
+                self.labelnames = labelnames [ : 30]
 
         elif mode == 'test':
             # Test 모드: 테스트 이미지 로드

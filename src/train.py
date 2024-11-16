@@ -32,6 +32,7 @@ def do_train(cfg):
     
     train_loader, val_loader = get_train_val_loader(cfg)
 
+
     # train(model, train_loader, val_loader, criterion, optimizer)
     train(model, train_loader, val_loader, criterion, optimizer, cfg)
 

@@ -1,7 +1,7 @@
 data :
-  train_data_path : '/data/ephemeral/home/data/train/DCM'
-  train_label_path : '/data/ephemeral/home/data/train/outputs_json'
-  test_data_path : '/data/ephemeral/home/data/test/DCM'
+  train_data_path : '/data/ephemeral/home/train/DCM'
+  train_label_path : '/data/ephemeral/home/train/outputs_json'
+  test_data_path : '/data/ephemeral/home/test/DCM'
   classes : [
     'finger-1', 'finger-2', 'finger-3', 'finger-4', 'finger-5',
     'finger-6', 'finger-7', 'finger-8', 'finger-9', 'finger-10',
@@ -93,7 +93,7 @@ optimizer:
   weight_decay: 1e-6
 
 # 디버깅 모드
-debug: False
+debug: True
 
 
 

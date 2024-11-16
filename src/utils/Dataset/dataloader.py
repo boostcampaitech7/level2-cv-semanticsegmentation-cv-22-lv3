@@ -68,6 +68,7 @@ def get_test_loader(config : Dict[str, Any]) -> DataLoader :
 
     return test_loader
 
+
 if __name__ == "__main__":
     # argparse를 사용하여 명령줄 인자 파싱
     parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
