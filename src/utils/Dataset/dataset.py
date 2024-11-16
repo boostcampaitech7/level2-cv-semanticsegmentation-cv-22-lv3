@@ -9,22 +9,20 @@ import torch
 import albumentations as A
 import argparse
 import matplotlib.pyplot as plt
-from transform import get_transforms
-from split_dataset.splitdata import split_data
+from .transform import get_transforms
+from .split_dataset.splitdata import split_data
 from typing import Dict, Any, Tuple
+from omegaconf import OmegaConf
 
 
-
-def load_config(config_path : str) -> dict:
-    with open(config_path, 'r') as data_config :
-        data_config = yaml.safe_load(data_config)
-        
-    return data_config
+def load_config(config_path: str):
+    config = OmegaConf.load(config_path)
+    return config
 
 
 def check_image_label_pair(config) -> tuple[list[str], list[str]]:
-    train_data_path = config['data']['train_data_path']
-    train_label_path = config['data']['train_label_path']
+    train_data_path = config.data.train_data_path
+    train_label_path = config.data.train_label_path
 
     # config에서 경로를 불러와 .png 파일들을 저장한다
     images = {
@@ -57,7 +55,7 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
 
 
 def load_test_images(config):
-            test_data_path = config['data']['test_data_path']
+            test_data_path = config.data.test_data_path
             images = sorted([
                 os.path.relpath(os.path.join(root, fname), start=test_data_path)
                 for root, _, files in os.walk(test_data_path)
@@ -87,7 +85,7 @@ class XRayDataset(Dataset):
             imagenames, labelnames = split_data(
                 _imagenames, _labelnames, left_right_group,
                 config=config, mode=mode,
-                split_method=config['data'].get('split_method', 'GroupKFold')
+                split_method=config.data.get('split_method', 'GroupKFold')
             )
 
             self.imagenames = imagenames
@@ -102,7 +100,7 @@ class XRayDataset(Dataset):
             raise ValueError("Invalid mode. Choose 'train', 'val', or 'test'.")
 
     def load_test_images(self, config: Dict[str, Any]) -> Tuple[list, str]:
-        test_data_path = config['data']['test_data_path']
+        test_data_path = config.data.test_data_path
         images = sorted([
             os.path.relpath(os.path.join(root, fname), start=test_data_path)
             for root, _, files in os.walk(test_data_path)
@@ -121,7 +119,7 @@ class XRayDataset(Dataset):
         image_name = self.imagenames[item]
 
         if self.mode == 'test':
-            image_path = os.path.join(self.config['data']['test_data_path'], image_name)
+            image_path = os.path.join(self.config.data.test_data_path, image_name)
             image = cv2.imread(image_path)
             # 필요한 전처리 적용
             if self.transforms is not None:
@@ -136,16 +134,16 @@ class XRayDataset(Dataset):
 
 
         else:
-            image_path = os.path.join(self.config['data']['train_data_path'], image_name)
+            image_path = os.path.join(self.config.data.train_data_path, image_name)
 
             image = cv2.imread(image_path)
             # image = image / 255 
 
             label_name = self.labelnames[item]
-            label_path = os.path.join(self.config['data']['train_label_path'], label_name)
+            label_path = os.path.join(self.config.data.train_label_path, label_name)
             
             # 라벨의 형태를 생성한다 : 이미지의 높이와 넓이 + 클래스 수 의 형태로 만든들고, 모두 0으로 만들어준다 ( H, W, Class)
-            label_shape = tuple(image.shape[:2]) + (len(self.config['data']['class']),)        
+            label_shape = tuple(image.shape[:2]) + (len(self.config.data.classes),)        
             label = np.zeros(label_shape, dtype = np.uint8)
 
             # label의 annotation 정보를 가지고 온다.
@@ -153,7 +151,7 @@ class XRayDataset(Dataset):
                 annotations = json.load(f)
             annotations = annotations['annotations']
             
-            CLASS2IND = {v: i for i , v in enumerate(self.config['data']['class'])}
+            CLASS2IND = {v: i for i , v in enumerate(self.config.data.classes)}
             IND2CLASS = {v: k for k , v in CLASS2IND.items()}
 
             for ann in annotations:

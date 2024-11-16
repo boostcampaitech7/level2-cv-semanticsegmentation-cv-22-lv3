@@ -6,3 +6,4 @@ checkpoints
 *.log
 *.ipynb
 baseline_code.py
+__pycache__

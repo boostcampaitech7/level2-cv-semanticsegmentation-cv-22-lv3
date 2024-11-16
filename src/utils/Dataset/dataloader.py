@@ -1,14 +1,16 @@
 from torch.utils.data import DataLoader
-from transform import get_transforms
-from dataset import XRayDataset
 from typing import Dict, Any, Tuple
 import yaml
 import argparse
 
-def load_config(config_path : str) -> dict:
-    with open(config_path, 'r') as data_config :
-        data_config = yaml.safe_load(data_config)
-    return data_config
+from utils.Dataset.transform import get_transforms
+from utils.Dataset.dataset import XRayDataset
+from omegaconf import OmegaConf
+
+
+def load_config(config_path: str):
+    config = OmegaConf.load(config_path)
+    return config
 
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:
@@ -27,19 +29,19 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
 
     train_loader = DataLoader(
         dataset = train_datasets,
-        batch_size = config['data']['train']['batch_size'],
-        shuffle = config['data']['train']['suffle'],
-        num_workers = config['data']['train']['num_workers'],
-        pin_memory = config['data']['train']['pin_memory']
+        batch_size = config.data.train.batch_size,
+        shuffle = config.data.train.shuffle,
+        num_workers = config.data.train.num_workers,
+        pin_memory = config.data.train.pin_memory
     )
 
 
     val_loader = DataLoader(
         dataset = val_datasets,
-        batch_size = config['data']['valid']['batch_size'],
-        shuffle = config['data']['valid']['suffle'],
-        num_workers = config['data']['valid']['num_workers'],
-        pin_memory = config['data']['valid']['pin_memory']
+        batch_size = config.data.valid.batch_size,
+        shuffle = config.data.valid.shuffle,
+        num_workers = config.data.valid.num_workers,
+        pin_memory = config.data.valid.pin_memory
     )
 
     return train_loader, val_loader
@@ -55,10 +57,10 @@ def get_test_loader(config : Dict[str, Any]) -> DataLoader :
 
     test_loader = DataLoader(
         dataset = test_datasets,
-        batch_size = config['data']['test']['batch_size'],
-        shuffle = config['data']['test']['suffle'],
-        num_workers = config['data']['test']['num_workers'],
-        pin_memory = config['data']['test']['pin_memory']
+        batch_size = config.data.test.batch_size,
+        shuffle = config.data.test.shuffle,
+        num_workers = config.data.test.num_workers,
+        pin_memory = config.data.test.pin_memory
     )
 
     return test_loader
