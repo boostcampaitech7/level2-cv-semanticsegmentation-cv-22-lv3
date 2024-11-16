@@ -9,25 +9,25 @@ import torch
 import numpy as np
 
 
-def do_train(cfg_data):
-    if cfg_data.debug:
-        cfg_data.train.max_epoch = 2
-        cfg_data.val.interval = 1
+def do_train(cfg):
+    if cfg.debug:
+        cfg.train.max_epoch = 2
+        cfg.val.interval = 1
 
     model = models.segmentation.fcn_resnet50(pretrained=True)
 
-    model.classifier[4] = nn.Conv2d(512, len(cfg_data.data.classes), kernel_size=1)
+    model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
 
     # Loss function을 정의합니다.
     criterion = nn.BCEWithLogitsLoss()
 
     # Optimizer를 정의합니다.
-    optimizer = optim.Adam(params=model.parameters(), lr=cfg_data.optimizer.lr, weight_decay=cfg_data.optimizer.weight_decay)
+    optimizer = optim.Adam(params=model.parameters(), lr=cfg.optimizer.lr, weight_decay=cfg.optimizer.weight_decay)
 
     # 시드를 설정합니다.
-    set_seed(cfg_data.seed)
+    set_seed(cfg.seed)
     
-    train_loader, val_loader = get_train_val_loader(cfg_data)
+    train_loader, val_loader = get_train_val_loader(cfg)
 
     # train(model, train_loader, val_loader, criterion, optimizer, config_train, config)
     train(model, train_loader, val_loader, criterion, optimizer, config)
