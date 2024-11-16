@@ -32,7 +32,8 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         batch_size = config.data.train.batch_size,
         shuffle = config.data.train.shuffle,
         num_workers = config.data.train.num_workers,
-        pin_memory = config.data.train.pin_memory
+        pin_memory = config.data.train.pin_memory,
+        drop_last = config.data.train.drop_last
     )
 
 
@@ -41,7 +42,8 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         batch_size = config.data.valid.batch_size,
         shuffle = config.data.valid.shuffle,
         num_workers = config.data.valid.num_workers,
-        pin_memory = config.data.valid.pin_memory
+        pin_memory = config.data.valid.pin_memory,
+        drop_last = config.data.valid.drop_last
     )
 
     return train_loader, val_loader
@@ -60,7 +62,8 @@ def get_test_loader(config : Dict[str, Any]) -> DataLoader :
         batch_size = config.data.test.batch_size,
         shuffle = config.data.test.shuffle,
         num_workers = config.data.test.num_workers,
-        pin_memory = config.data.test.pin_memory
+        pin_memory = config.data.test.pin_memory,
+        drop_last = config.data.test.drop_last
     )
 
     return test_loader
