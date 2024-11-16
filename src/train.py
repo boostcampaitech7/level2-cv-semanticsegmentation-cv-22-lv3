@@ -7,6 +7,8 @@ from omegaconf import OmegaConf
 import argparse
 import torch
 import numpy as np
+from model.torchvision.model_loader import model_loader
+from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 
 
 def do_train(cfg):
@@ -14,23 +16,24 @@ def do_train(cfg):
         cfg.train.max_epoch = 2
         cfg.val.interval = 1
 
-    model = models.segmentation.fcn_resnet50(pretrained=True)
+    model = model_loader(cfg)
 
-    model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
+    # Loss function 선택
+    criterion = loss_func_loader(cfg.loss_name)
 
-    # Loss function을 정의합니다.
-    criterion = nn.BCEWithLogitsLoss()
+    # Optimizer 선택
+    optimizer = optimizer_loader(cfg, model.parameters())
 
-    # Optimizer를 정의합니다.
-    optimizer = optim.Adam(params=model.parameters(), lr=cfg.optimizer.lr, weight_decay=cfg.optimizer.weight_decay)
+    # Scheduler 선택
+
 
     # 시드를 설정합니다.
     set_seed(cfg.seed)
     
     train_loader, val_loader = get_train_val_loader(cfg)
 
-    # train(model, train_loader, val_loader, criterion, optimizer, config_train, config)
-    train(model, train_loader, val_loader, criterion, optimizer, config)
+    # train(model, train_loader, val_loader, criterion, optimizer)
+    train(model, train_loader, val_loader, criterion, optimizer, cfg)
 
 
 
@@ -38,7 +41,9 @@ if __name__ == "__main__":
     # argparse를 사용하여 명령줄 인자 파싱
     parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
     # parser.add_argument('--config_train', type=str, default='configs/train/base_train.yaml', help='Path to the train config file')
-    parser.add_argument('--config', type=str, default='configs/data/config.yaml', help='Path to the data config file')
+    parser.add_argument('--config', type=str, 
+                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/base_config.yaml', 
+                        help='Path to the data config file')
 
     args = parser.parse_args()
 

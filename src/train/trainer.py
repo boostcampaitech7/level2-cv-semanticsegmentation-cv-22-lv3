@@ -30,7 +30,7 @@ def set_seed(seed):
 
 
 # valid set test
-def validation(epoch, model, data_loader, criterion, thr=0.5, config=None):
+def validation(epoch, model, data_loader, criterion, config=None):
     print(f'Start validation #{epoch:2d}')
     model.eval()
 
@@ -58,7 +58,7 @@ def validation(epoch, model, data_loader, criterion, thr=0.5, config=None):
             cnt += 1
             
             outputs = torch.sigmoid(outputs)
-            outputs = (outputs > thr).detach().cpu()
+            outputs = (outputs > config.val.threshold).detach().cpu()
             masks = masks.detach().cpu()
             
             dice = dice_coef(outputs, masks)
@@ -68,7 +68,7 @@ def validation(epoch, model, data_loader, criterion, thr=0.5, config=None):
     dices_per_class = torch.mean(dices, 0)
     dice_str = [
         f"{c:<12}: {d.item():.4f}"
-        for c, d in zip(config.train.classes, dices_per_class)
+        for c, d in zip(config.data.classes, dices_per_class)
     ]
     dice_str = "\n".join(dice_str)
     print(dice_str)
@@ -79,6 +79,7 @@ def validation(epoch, model, data_loader, criterion, thr=0.5, config=None):
 
 # trainer
 def train(model, train_loader, val_loader, criterion, optimizer, config):
+    print(f'max_epoch: {config.train.max_epoch}, valid & save_interval: {config.val.interval}')
     print(f'Start training..')
 
     config = config
@@ -86,6 +87,9 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
     
     n_class = len(config.data.classes)
     best_dice = 0.
+
+    # 체크포인트 저장할 폴더 없을 경우 생성
+    os.makedirs(config.save_dir, exist_ok=True)
     
     for epoch in range(config.train.max_epoch):
         model.train()
@@ -104,7 +108,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
             optimizer.step()
             
             # step 주기에 따라 loss를 출력합니다.
-            if (step + 1) % 25 == 0:
+            if (step + 1) % config.train.print_step == 0:
                 print(
                     f'{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | '
                     f'Epoch [{epoch+1}/{config.train.max_epoch}], '
@@ -112,14 +116,20 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                     f'Loss: {round(loss.item(),4)}'
                 )
              
-        # validation 주기에 따라 loss를 출력하고 best model을 저장합니다.
+        # validation 주기에 따라 loss를 출력 및 checkpoint 저장하고 best model을 저장합니다.
         if (epoch + 1) % config.val.interval == 0:
             dice = validation(epoch + 1, model, val_loader, criterion, config=config)
+
+            save_model(model, file_name=f'epoch_{epoch+1}_model.pt', config=config)
+            print(f"Save epoch {epoch+1}model in {config.save_dir}")
+
             
             if best_dice < dice:
                 print(f"Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
-                print(f"Save model in {config.save_dir}")
+                print(f"Save best model in {config.save_dir}")
                 best_dice = dice
-                save_model(model,config)
+                save_model(model, config=config)
+
+
 
 
