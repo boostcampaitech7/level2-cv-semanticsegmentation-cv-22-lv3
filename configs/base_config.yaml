@@ -74,13 +74,14 @@ augmentation:
 train:
   classes: 29
   batch_size: 8
-  max_epoch: 10
+  max_epoch: 100
   print_step: 20
 val:
   batch_size: 4
-  interval: 1
+  interval: 10
   threshold: 0.5
 
+# 체크포인트 저장 경로
 save_dir: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel
 
 seed: 42
@@ -97,12 +98,8 @@ debug: True
 
 
 
-library: 'torchvision'
-model_name: 'fcn_resnet50'
-pretrained: True
-
 inference:
   threshold: 0.5
   output_size: [2048, 2048]  # 튜플을 리스트로 수정
-  checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel/epoch_3_model.pt"  # .ckpt에서 .pt로 수정
-  output_dir: "../results"
+  checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/lraspp_mobilenet/lraspp_mobilenet_v3_large_best_model.pt"  # .ckpt에서 .pt로 수정
+  output_dir: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/results"
