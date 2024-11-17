@@ -1,0 +1,2 @@
+encoder_name: "dpn98"
+encoder_weights: "imagenet"

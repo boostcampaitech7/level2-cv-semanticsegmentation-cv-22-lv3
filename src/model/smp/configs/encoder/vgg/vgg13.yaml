@@ -1,0 +1,2 @@
+encoder_name: "vgg13"
+encoder_weights: "imagenet"

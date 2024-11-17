@@ -1,0 +1,2 @@
+encoder_name: "resnet101"
+encoder_weights: "imagenet"

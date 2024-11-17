@@ -1,0 +1,2 @@
+encoder_name: "timm-regnetx_080"
+encoder_weights: "imagenet"

@@ -1,0 +1,2 @@
+encoder_name: "se_resnet152"
+encoder_weights: "imagenet"

@@ -1,0 +1,2 @@
+encoder_name: "efficientnet-b1"
+encoder_weights: "imagenet"

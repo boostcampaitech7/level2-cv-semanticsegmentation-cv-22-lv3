@@ -1,4 +1,0 @@
-library: 'torchvision'
-model_name: 'deeplabv3_mobilenet_v3_large'
-num_classes: 29
-pretrained: True
