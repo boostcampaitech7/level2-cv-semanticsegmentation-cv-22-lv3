@@ -65,6 +65,8 @@ if __name__ == "__main__":
     config = load_config(base_config=args.config,
                          model_config=args.model,
                          encoder_config=args.encoder,
-                         save_path=args.save)
+                         save_config=args.save_config,
+                         save_dir=args.save_dir)
+
     # do_train(config_train, config)
     do_train(config)

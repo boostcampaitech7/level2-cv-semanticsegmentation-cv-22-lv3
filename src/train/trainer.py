@@ -12,8 +12,10 @@ import torch.nn.functional as F
 
 from utils.metrics import dice_coef
 
-def load_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, save_path: Optional[str] = None) -> str:
-    # Load configurations
+
+def merge_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, 
+                save_config: Optional[str] = None, save_dir: Optional[str] = None) -> str:
+    
     base_config = OmegaConf.load(base_config)
     model_config = OmegaConf.load(model_config)
 
@@ -24,12 +26,23 @@ def load_config(base_config: str, model_config: str, encoder_config: Optional[st
     else:
         merged_config = OmegaConf.merge(base_config, model_config)
 
-    # Save configuration if save_path is provided
-    if save_path:
-        OmegaConf.save(merged_config, save_path)
+
+    # Save configuration if save_config is provided
+    if save_config:
+        OmegaConf.save(merged_config, save_config)
+
 
     # Return merged configuration and save path
     return merged_config
+
+
+def load_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, 
+                save_config: Optional[str] = None, save_dir: Optional[str] = None) -> str:
+    
+    config = merge_config(base_config, model_config, encoder_config, save_config, save_dir)
+
+    return config
+
 
 def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
     output_path = os.path.join(config.save_dir, file_name)
@@ -152,8 +165,9 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                 print(f"Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
                 print(f"Save best model in {config.save_dir}")
                 best_dice = dice
-                # library에 따라 모델 이름 다른 key값 반영
-                if config.model.architecture.model_name:
+                
+
+                if config.model.library == 'torchvision':
                     save_model(model, file_name=f'{config.model.architecture.model_name}_best_model.pt', config=config)
                 else:
                     save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
