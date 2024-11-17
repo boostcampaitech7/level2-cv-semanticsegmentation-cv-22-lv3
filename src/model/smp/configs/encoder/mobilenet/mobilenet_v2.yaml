@@ -1,2 +1,4 @@
-encoder_name: "mobilenet_v2"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "mobilenet_v2"
+    encoder_weights: "imagenet"

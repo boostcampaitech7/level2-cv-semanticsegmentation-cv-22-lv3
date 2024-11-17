@@ -1,2 +1,4 @@
-encoder_name: "se_resnet101"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "se_resnet101"
+    encoder_weights: "imagenet"

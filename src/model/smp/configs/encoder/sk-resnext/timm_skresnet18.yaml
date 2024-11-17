@@ -1,2 +1,4 @@
-encoder_name: "timm-skresnet18"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "timm-skresnet18"
+    encoder_weights: "imagenet"

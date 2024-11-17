@@ -1,2 +1,4 @@
-encoder_name: "densenet121"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "densenet121"
+    encoder_weights: "imagenet"

@@ -1,2 +1,4 @@
-encoder_name: "timm-res2net50_26w_4s"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "timm-res2net50_26w_4s"
+    encoder_weights: "imagenet"

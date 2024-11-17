@@ -1,2 +1,4 @@
-encoder_name: "efficientnet-b2"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "efficientnet-b2"
+    encoder_weights: "imagenet"

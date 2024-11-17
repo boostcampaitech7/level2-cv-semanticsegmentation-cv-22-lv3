@@ -1,2 +1,4 @@
-encoder_name: "senet154"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "senet154"
+    encoder_weights: "imagenet"
