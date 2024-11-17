@@ -1,0 +1,2 @@
+encoder_name: "timm-gernet_l"
+encoder_weights: "imagenet"

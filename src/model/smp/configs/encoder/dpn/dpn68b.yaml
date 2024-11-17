@@ -1,0 +1,2 @@
+encoder_name: "dpn68b"
+encoder_weights: "imagenet+5k"

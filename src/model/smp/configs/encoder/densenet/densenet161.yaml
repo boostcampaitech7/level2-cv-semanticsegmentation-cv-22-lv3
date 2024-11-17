@@ -1,0 +1,2 @@
+encoder_name: "densenet161"
+encoder_weights: "imagenet"

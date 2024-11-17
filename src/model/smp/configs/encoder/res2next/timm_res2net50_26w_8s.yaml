@@ -1,0 +1,2 @@
+encoder_name: "timm-res2net50_26w_8s"
+encoder_weights: "imagenet"

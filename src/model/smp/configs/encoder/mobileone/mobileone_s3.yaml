@@ -1,0 +1,2 @@
+encoder_name: "mobileone_s3"
+encoder_weights: "imagenet"
