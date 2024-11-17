@@ -1,2 +1,4 @@
-encoder_name: "se_resnext101_32x4d"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "se_resnext101_32x4d"
+    encoder_weights: "imagenet"

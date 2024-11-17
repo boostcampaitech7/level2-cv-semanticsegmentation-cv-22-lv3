@@ -1,2 +1,4 @@
-encoder_name: "mit_b0"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "mit_b0"
+    encoder_weights: "imagenet"

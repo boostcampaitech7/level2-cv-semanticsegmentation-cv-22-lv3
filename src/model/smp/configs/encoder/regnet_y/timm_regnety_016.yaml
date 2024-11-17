@@ -1,2 +1,4 @@
-encoder_name: "timm-regnety_016"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "timm-regnety_016"
+    encoder_weights: "imagenet"

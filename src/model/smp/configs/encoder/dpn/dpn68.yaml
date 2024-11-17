@@ -1,2 +1,4 @@
-encoder_name: "dpn68"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "dpn68"
+    encoder_weights: "imagenet"

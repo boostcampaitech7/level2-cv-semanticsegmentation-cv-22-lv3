@@ -1,2 +1,4 @@
-encoder_name: "resnet152"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "resnet152"
+    encoder_weights: "imagenet"

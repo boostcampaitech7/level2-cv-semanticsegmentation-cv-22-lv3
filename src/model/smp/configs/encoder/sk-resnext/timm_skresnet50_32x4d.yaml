@@ -1,2 +1,4 @@
-encoder_name: "timm-skresnext50_32x4d"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "timm-skresnext50_32x4d"
+    encoder_weights: "imagenet"

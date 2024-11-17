@@ -1,2 +1,4 @@
-encoder_name: "inceptionresnetv4"
-encoder_weights: "imagenet+background"
+model:
+  architecture:
+    encoder_name: "inceptionresnetv4"
+    encoder_weights: "imagenet+background"

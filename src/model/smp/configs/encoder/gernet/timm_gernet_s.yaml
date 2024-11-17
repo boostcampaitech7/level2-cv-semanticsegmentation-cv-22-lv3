@@ -1,2 +1,4 @@
-encoder_name: "timm-gernet_s"
-encoder_weights: "imagenet"
+model:
+  architecture:
+    encoder_name: "timm-gernet_s"
+    encoder_weights: "imagenet"
