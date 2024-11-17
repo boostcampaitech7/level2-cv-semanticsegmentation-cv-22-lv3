@@ -159,5 +159,3 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                     save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
 
 
-
-
