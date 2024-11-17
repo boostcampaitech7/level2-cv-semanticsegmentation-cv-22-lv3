@@ -125,12 +125,14 @@ def do_inference(cfg):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test Semantic Segmentation Model")
-    parser.add_argument('--config', type=str, default='configs/base_config.yaml', help='Path to the data config file')
+    parser.add_argument('--config', type=str, default='configs/base_config.yaml', help='Path to the experiment config file')
+    parser.add_argument('--checkpoint', type=str, default='checkpoints/fcn_resnet50_best_model.pt', help='Path to the pretrained model pt file')
 
     args = parser.parse_args()
 
     # cfg 파일 로드
     cfg = OmegaConf.load(args.config)
+    cfg.inference.checkpoint_path = args.checkpoint
     
     # inference 실행
     output_path = do_inference(cfg)
