@@ -152,7 +152,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                 print(f"Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
                 print(f"Save best model in {config.save_dir}")
                 best_dice = dice
-                save_model(model, file_name=f'{config.model_name}_best_model.pt', config=config)
+                # library에 따라 모델 이름 다른 key값 반영
+                if config.model.architecture.model_name:
+                    save_model(model, file_name=f'{config.model.architecture.model_name}_best_model.pt', config=config)
+                else:
+                    save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
 
 
 
