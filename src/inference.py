@@ -9,7 +9,7 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from utils.Dataset.dataloader import get_test_loader
-from model.torchvision.model_loader import model_loader
+from model.model_loader import model_loader
 import os
 from datetime import datetime
 import pytz
