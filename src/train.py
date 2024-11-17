@@ -44,16 +44,19 @@ if __name__ == "__main__":
     # parser.add_argument('--config_train', type=str, default='configs/train/base_train.yaml', help='Path to the train config file')
     parser.add_argument('--config', type=str, 
                         default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/base_config.yaml', 
-                        help='Path to the data config file')
+                        help='Path to the config file for train')
     parser.add_argument('--model', type=str, 
                         default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/src/model/torchvision/configs/lr_aspp_mobilenetv3_large.yaml', 
                         help='Path to the model config file')
     parser.add_argument('--encoder', type=str, 
                         default=None, 
                         help='Path to the encoder config file')
-    parser.add_argument('--save', type=str, 
+    parser.add_argument('--save_dir', type=str, 
+                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel', 
+                        help='Path to the model save_dir')
+    parser.add_argument('--save_config', type=str, 
                         default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/exp_config.yaml', 
-                        help='Path to the encoder config file')
+                        help='Path to the config file')
 
     args = parser.parse_args()
 
