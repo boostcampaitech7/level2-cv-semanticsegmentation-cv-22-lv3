@@ -1,50 +1,82 @@
-from torchvision import models
-import torch.nn as nn
-import torch.optim as optim
-from train.trainer import set_seed, train
-from utils.Dataset.dataloader import get_train_val_loader
-from omegaconf import OmegaConf
+import wandb
 import argparse
-import torch
-import numpy as np
+from train.trainer import train
+from omegaconf import OmegaConf
+from utils.set_seed import set_seed
+from configs.utils import ConfigManager
+from model.model_loader import model_loader
+from Dataset.dataloader import get_train_val_loader
+from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 
 
-def do_train(cfg):
+def do_train(cfg, project_name, run_name):
     if cfg.debug:
         cfg.train.max_epoch = 2
+        cfg.train.print_step = 1
         cfg.val.interval = 1
 
-    model = models.segmentation.fcn_resnet50(pretrained=True)
 
-    model.classifier[4] = nn.Conv2d(512, len(cfg.data.classes), kernel_size=1)
+    model, _ = model_loader(cfg)
+    criterion = loss_func_loader(cfg)
+    optimizer = optimizer_loader(cfg, model.parameters())
 
-    # Loss function을 정의합니다.
-    criterion = nn.BCEWithLogitsLoss()
 
-    # Optimizer를 정의합니다.
-    optimizer = optim.Adam(params=model.parameters(), lr=cfg.optimizer.lr, weight_decay=cfg.optimizer.weight_decay)
+    wandb.init(
+        project=project_name,  
+        name=run_name,         
+        config=OmegaConf.to_container(cfg, resolve=True),
+        reinit=True
+    )
+    wandb.watch(model, log = 'all')
 
-    # 시드를 설정합니다.
+
+    # Scheduler 선택
+    # scheduler = lr_scheduler_loader(cfg, optimizer)
+
+
     set_seed(cfg.seed)
-    
     train_loader, val_loader = get_train_val_loader(cfg)
-
-    # train(model, train_loader, val_loader, criterion, optimizer, config_train, config)
-    train(model, train_loader, val_loader, criterion, optimizer, config)
-
+    train(model, train_loader, val_loader, criterion, optimizer, cfg)
+    wandb.finish()
 
 
 if __name__ == "__main__":
-    # argparse를 사용하여 명령줄 인자 파싱
     parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
-    # parser.add_argument('--config_train', type=str, default='configs/train/base_train.yaml', help='Path to the train config file')
-    parser.add_argument('--config', type=str, default='configs/data/config.yaml', help='Path to the data config file')
+
+    parser.add_argument('--config', type=str, 
+                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/base_config.yaml', 
+                        help='Path to the config file for train')
+    
+
+    parser.add_argument('--model', type=str, 
+                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/src/model/torchvision/configs/fcn_resnet50.yaml', 
+                        help='Path to the model config file')
+    
+
+    parser.add_argument('--encoder', type=str, 
+                        default=None, 
+                        help='Path to the encoder config file')
+    
+
+    parser.add_argument('--project_name', type = str,
+                        default='이름 미지정 프로젝트',
+                        help='Write a wandb project name'
+                        )
+    
+
+    parser.add_argument('--run_name', type=str,
+                        default='이름 미지정 실험',
+                        help='Write a wandb run name'
+                        )
 
     args = parser.parse_args()
+    
 
-    # 설정 파일 로드
-    # config_train = OmegaConf.load(args.config_train)
-    config = OmegaConf.load(args.config)
+    config_manager = ConfigManager(base_config=args.config,
+                         model_config=args.model,
+                         encoder_config=args.encoder,
+                         )
+    
 
-    # do_train(config_train, config)
-    do_train(config)
+    config = config_manager.load_config()
+    do_train(config, args.project_name, args.run_name)

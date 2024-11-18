@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: "mobileone_s4"
+    encoder_weights: "imagenet"

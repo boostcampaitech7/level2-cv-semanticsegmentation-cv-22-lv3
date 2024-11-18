@@ -1,0 +1,5 @@
+model:
+  library: "torchvision"
+  architecture:
+    base_model: "fcn_resnet50"
+    pretrained: True

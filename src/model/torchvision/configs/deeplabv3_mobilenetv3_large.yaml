@@ -1,0 +1,5 @@
+model:
+  library: "torchvision"
+  architecture:
+    base_model: "deeplabv3_mobilenet_v3_large"
+    pretrained: True

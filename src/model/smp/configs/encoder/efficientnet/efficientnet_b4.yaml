@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: "efficientnet-b4"
+    encoder_weights: "imagenet"

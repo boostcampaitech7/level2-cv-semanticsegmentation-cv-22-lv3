@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: "resnext101_32x8d"
+    encoder_weights: "imagenet"

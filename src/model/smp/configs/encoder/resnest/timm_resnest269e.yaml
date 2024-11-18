@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: "timm-resnest269e"
+    encoder_weights: "imagenet"
