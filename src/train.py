@@ -7,7 +7,7 @@ import wandb
 from configs.utils import ConfigManager
 from omegaconf import OmegaConf
 
-def do_train(cfg):
+def do_train(cfg, project_name, run_name):
     if cfg.debug:
         cfg.train.max_epoch = 2
         cfg.train.print_step = 1
@@ -25,10 +25,10 @@ def do_train(cfg):
 
     # wandb 초기화
     wandb.init(
-        project = 'Segmentation Baseline',
-        name = f'Run_Name_model_{str(model_name)}',
-        config = OmegaConf.to_container(cfg, resolve=True),
-        reinit = True
+        project=project_name,  # argparse로 전달받은 프로젝트 이름 사용
+        name=run_name,         # argparse로 전달받은 실행 이름 사용
+        config=OmegaConf.to_container(cfg, resolve=True),
+        reinit=True
     )
     wandb.watch(model, log = 'all')
 
@@ -61,15 +61,24 @@ if __name__ == "__main__":
     parser.add_argument('--encoder', type=str, 
                         default=None, 
                         help='Path to the encoder config file')
+    parser.add_argument('--project_name', type = str,
+                        default='이름 미지정 프로젝트',
+                        help='Write a wandb project name'
+                        )
+    parser.add_argument('--run_name', type=str,
+                        default='이름 미지정 실험',
+                        help='Write a wandb run name'
+                        )
     # basemodel_시간 -> 폴더 생성
 
     args = parser.parse_args()
     
     config_manager = ConfigManager(base_config=args.config,
                          model_config=args.model,
-                         encoder_config=args.encoder)
+                         encoder_config=args.encoder,
+                         )
     
     config = config_manager.load_config()
 
     # do_train(config_train, config)
-    do_train(config)
+    do_train(config, args.project_name, args.run_name)
