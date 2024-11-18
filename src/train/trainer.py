@@ -50,7 +50,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
             stage_trainloader = train_loader
             stage_valloader = val_loader
         else:
-            stage_epoch = int(config.train.max_epoch * float(1 - config.train.ratio ))
+            stage_epoch = 1 + int(config.train.max_epoch * float(1 - config.train.ratio ))
             stage_trainloader = val_loader
             stage_valloader = train_loader
 
@@ -62,7 +62,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
 
         for epoch in range(stage_epoch):
             model.train()
-
 
             for step, (images, masks) in enumerate(stage_trainloader):            
                 images, masks = images.cuda(), masks.cuda()
