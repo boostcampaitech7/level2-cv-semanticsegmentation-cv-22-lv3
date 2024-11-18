@@ -88,12 +88,20 @@ save:
 
 seed: 42
 
-loss_name: BCEWithLogitsLoss
+loss_func: 
+  name: BCEWithLogitsLoss
 
 optimizer: 
   name: Adam
   lr: 1e-4
   weight_decay: 1e-6
+
+# 추후에 설정
+# scheduler:
+  # name: CosineAnnealingLR
+  # T_max: 50
+  # eta_min: 0  # default
+  # last_epoch: -1  # default
 
 # 디버깅 모드
 debug: True

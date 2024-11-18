@@ -3,6 +3,7 @@ import random
 import numpy as np
 from tqdm.auto import tqdm
 import datetime
+import pytz
 from omegaconf import OmegaConf
 from typing import Dict, Any, Tuple, Optional
 import argparse
@@ -88,8 +89,9 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
     print(f'max_epoch: {config.train.max_epoch}, valid & save_interval: {config.val.interval}')
     print(f'Start training..')
 
+    # 한국 시간대(KST)를 설정
     kst = pytz.timezone('Asia/Seoul')
-
+    
     best_dice = 0.
 
     # 체크포인트 저장할 폴더 없을 경우 생성
@@ -120,6 +122,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                     f'Step [{step+1}/{len(train_loader)}], '
                     f'Loss: {round(loss.item(),4)}'
                 )
+        # 각 epoch이 끝난 후 스케쥴러 업데이트
+        # scheduler.step()
              
         # validation 주기에 따라 loss를 출력 및 checkpoint 저장하고 best model을 저장합니다.
         if (epoch + 1) % config.val.interval == 0:
