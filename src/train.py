@@ -10,13 +10,15 @@ import numpy as np
 from model.model_loader import model_loader
 from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 from train.trainer import load_config
+import wandb
 
 def do_train(cfg):
     if cfg.debug:
         cfg.train.max_epoch = 2
         cfg.val.interval = 1
 
-    model = model_loader(cfg)
+    # model_loader에서 모델과 모델 이름 2개 return 하도록 수정
+    model, model_name = model_loader(cfg)
 
     # Loss function 선택
     criterion = loss_func_loader(cfg.loss_name)
@@ -24,17 +26,25 @@ def do_train(cfg):
     # Optimizer 선택
     optimizer = optimizer_loader(cfg, model.parameters())
 
-    # Scheduler 선택
+    # wandb 초기화
+    wandb.init(
+        project = 'Segmentation Baseline',
+        name = f'Run_Name_model_{str(model_name)}',
+        config = OmegaConf.to_container(cfg, resolve=True),
+        reinit = True
+    )
+    wandb.watch(model, log = 'all')
 
 
     # 시드를 설정합니다.
     set_seed(cfg.seed)
-    
     train_loader, val_loader = get_train_val_loader(cfg)
 
 
     # train(model, train_loader, val_loader, criterion, optimizer)
     train(model, train_loader, val_loader, criterion, optimizer, cfg)
+
+    wandb.finish()
 
 
 

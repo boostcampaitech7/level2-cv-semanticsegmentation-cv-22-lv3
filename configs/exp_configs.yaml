@@ -1,7 +1,7 @@
 data:
-  train_data_path: /data/ephemeral/home/train/DCM
-  train_label_path: /data/ephemeral/home/train/outputs_json
-  test_data_path: /data/ephemeral/home/test/DCM
+  train_data_path: /data/ephemeral/home/data/train/DCM
+  train_label_path: /data/ephemeral/home/data/train/outputs_json
+  test_data_path: /data/ephemeral/home/data/test/DCM
   classes:
   - finger-1
   - finger-2
@@ -90,8 +90,8 @@ augmentation:
       - 0.225
   test:
   - Resize:
-      height: 512
-      width: 512
+      height: 1024
+      width: 1024
   - Normalize:
       mean:
       - 0.485
@@ -103,12 +103,15 @@ augmentation:
       - 0.225
 train:
   classes: 29
-  batch_size: 8
-  max_epoch: 100
-  print_step: 20
+  batch_size: 4
+  max_epoch: 3
+  print_step: 1
+  ratio: 0.8
+  early_stopping_patience: 5
+  early_stopping_delta: 0.001
 val:
   batch_size: 4
-  interval: 10
+  interval: 1
   threshold: 0.5
 save_dir: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel
 seed: 42
@@ -117,7 +120,7 @@ optimizer:
   name: Adam
   lr: 0.0001
   weight_decay: 1.0e-06
-debug: true
+debug: false
 inference:
   threshold: 0.5
   output_size:
@@ -129,7 +132,7 @@ model:
   library: smp
   architecture:
     base_model: FPN
-    encoder_name: resnet18
+    encoder_name: resnet50
     encoder_depth: 5
     encoder_weights: imagenet
     decoder_pyramid_channels: 256
