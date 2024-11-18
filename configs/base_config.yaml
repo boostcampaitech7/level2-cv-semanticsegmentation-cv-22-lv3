@@ -12,8 +12,8 @@ data :
   ]
 
   fold : 0
-
   split_method : GroupKFold
+
 
   train : 
     batch_size : 4
@@ -21,14 +21,23 @@ data :
     num_workers : 2
     pin_memory : True
     drop_last : True
-  
+    print_step: 20
+    ratio : 0.8
+    early_stopping_patience : 5
+    early_stopping_delta : 0.001
+    max_epoch : 100
+    
+
   valid : 
     batch_size : 4
     shuffle : False
     num_workers : 2
     pin_memory : True
     drop_last : False
+    interval: 10
+    threshold: 0.5
   
+
   test : 
     batch_size : 4
     shuffle : False
@@ -70,21 +79,6 @@ augmentation:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
 
-# 수정 필요. train, val 위의 data.train 중복 됨
-train:
-  classes: 29
-  batch_size: 4
-  max_epoch: 100
-  print_step: 20
-  ratio : 0.8
-  early_stopping_patience : 5
-  early_stopping_delta : 0.001
-
-val:
-  batch_size: 4
-  interval: 10
-  threshold: 0.5
-
 save:
   # 실험 config 저장 경로
   save_config: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs
@@ -92,10 +86,8 @@ save:
   save_ckpt: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints
 
 seed: 42
-
 loss_func: 
   name: BCEWithLogitsLoss
-
 optimizer: 
   name: Adam
   lr: 1e-4
@@ -110,9 +102,6 @@ optimizer:
 
 # 디버깅 모드
 debug: False
-
-
-
 inference:
   threshold: 0.5
   output_size: [2048, 2048]  # 튜플을 리스트로 수정
