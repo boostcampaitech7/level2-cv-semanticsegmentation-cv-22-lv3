@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from utils.metrics import dice_coef
 from utils.set_seed import set_seed
 from model.utils.model_output import get_model_output
-from utils.Dataset.visualization.train_vis import visualize_predictions
+from Dataset.visualization.train_vis import visualize_predictions
 
 
 

@@ -80,8 +80,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
 
                 if (step + 1) % config.train.print_step == 0:
                     print(
-                        f'{datetime.datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")} | '
-                        f'Stage{stage} : Epoch [{epoch+1}/{int(config.train.max_epoch * config.train.ratio)}] | '
+                        f'{datetime.datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")} || '
+                        f'Stage{stage} || Epoch [{epoch+1}/{int(config.train.max_epoch * config.train.ratio)}] | '
                         f'Step [{step+1}/{len(stage_trainloader)}] | '
                         f'Loss: {round(loss.item(),4)}'
                     )

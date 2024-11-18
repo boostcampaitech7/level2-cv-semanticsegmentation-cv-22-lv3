@@ -4,8 +4,8 @@ import argparse
 from omegaconf import OmegaConf
 from typing import Dict, Any, Tuple
 from torch.utils.data import DataLoader
-from utils.Dataset.dataset import XRayDataset
-from utils.Dataset.transform import get_transforms
+from Dataset.dataset import XRayDataset
+from Dataset.transform import get_transforms
 
 
 

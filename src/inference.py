@@ -10,7 +10,7 @@ import torch.nn.functional as F
 from omegaconf import OmegaConf
 from train.trainer import set_seed
 from model.model_loader import model_loader
-from utils.Dataset.dataloader import get_test_loader
+from Dataset.dataloader import get_test_loader
 
 
 

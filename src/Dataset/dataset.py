@@ -10,8 +10,8 @@ from omegaconf import OmegaConf
 import matplotlib.pyplot as plt
 from typing import Dict, Any, Tuple
 from torch.utils.data import Dataset
-from utils.Dataset.transform import get_transforms
-from utils.Dataset.split_dataset.splitdata import split_data
+from Dataset.transform import get_transforms
+from Dataset.split_dataset.splitdata import split_data
 
 
 
