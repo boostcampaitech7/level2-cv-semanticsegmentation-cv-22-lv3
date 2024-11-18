@@ -24,7 +24,7 @@ def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
     # 체크포인트 파일 저장 경로
     save_path = os.path.join(save_ckpt, file_name)
     # 체크 포인트 저장
-    torch.save(model, save_path)
+    torch.save(model.state_dict(), save_path)
 
 
 def set_seed(seed):
