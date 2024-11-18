@@ -84,7 +84,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
                         f'Step [{step+1}/{len(stage_trainloader)}] | '
                         f'Loss: {round(loss.item(),4)}'
                     )
-                    wandb.log({'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
+                    wandb.log({f'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
                 
 
             if (epoch + 1) % config.data.valid.interval == 0:
