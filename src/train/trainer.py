@@ -6,48 +6,19 @@ import datetime
 from omegaconf import OmegaConf
 from typing import Dict, Any, Tuple, Optional
 import argparse
-
+import pytz
 import torch
 import torch.nn.functional as F
-
 from utils.metrics import dice_coef
 
 
-def merge_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, 
-                save_config: Optional[str] = None, save_dir: Optional[str] = None) -> str:
-    
-    base_config = OmegaConf.load(base_config)
-    model_config = OmegaConf.load(model_config)
-
-    # Conditionally merge encoder configuration
-    if encoder_config is not None:
-        encoder_config = OmegaConf.load(encoder_config)
-        merged_config = OmegaConf.merge(base_config, model_config, encoder_config)
-    else:
-        merged_config = OmegaConf.merge(base_config, model_config)
-
-
-    # Save configuration if save_config is provided
-    if save_config:
-        OmegaConf.save(merged_config, save_config)
-
-
-    # Return merged configuration and save path
-    return merged_config
-
-
-def load_config(base_config: str, model_config: str, encoder_config: Optional[str] = None, 
-                save_config: Optional[str] = None, save_dir: Optional[str] = None) -> str:
-    
-    config = merge_config(base_config, model_config, encoder_config, save_config, save_dir)
-
-    return config
-
-
 def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
-    output_path = os.path.join(config.save_dir, file_name)
-    torch.save(model, output_path)
-
+    # 체크포인트 저장 폴더 불러오가
+    save_ckpt = config.save.save_ckpt
+    # 체크포인트 파일 저장 경로
+    save_path = os.path.join(save_ckpt, file_name)
+    # 체크 포인트 저장
+    torch.save(model, save_path)
 
 def set_seed(seed):
     torch.manual_seed(seed)
@@ -71,7 +42,6 @@ def validation(epoch, model, data_loader, criterion, config=None):
 
     dices = []
     with torch.no_grad():
-        n_class = len(config.data.classes)
         total_loss = 0
         cnt = 0
 
@@ -118,14 +88,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
     print(f'max_epoch: {config.train.max_epoch}, valid & save_interval: {config.val.interval}')
     print(f'Start training..')
 
-    config = config
+    kst = pytz.timezone('Asia/Seoul')
 
-    
-    n_class = len(config.data.classes)
     best_dice = 0.
 
     # 체크포인트 저장할 폴더 없을 경우 생성
-    os.makedirs(config.save_dir, exist_ok=True)
+    #os.makedirs(config.save_dir, exist_ok=True)
     
     for epoch in range(config.train.max_epoch):
         model.train()
@@ -143,11 +111,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            
+
             # step 주기에 따라 loss를 출력합니다.
             if (step + 1) % config.train.print_step == 0:
                 print(
-                    f'{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | '
+                    f'{datetime.datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")} | '
                     f'Epoch [{epoch+1}/{config.train.max_epoch}], '
                     f'Step [{step+1}/{len(train_loader)}], '
                     f'Loss: {round(loss.item(),4)}'
@@ -157,19 +125,13 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
         if (epoch + 1) % config.val.interval == 0:
             dice = validation(epoch + 1, model, val_loader, criterion, config=config)
 
-            save_model(model, file_name=f'epoch_{epoch+1}_model.pt', config=config)
-            print(f"Save epoch {epoch+1}model in {config.save_dir}")
+            save_model(model, file_name=f'{config.model.architecture.base_model}_epoch_{epoch+1}_model.pt', config=config)
+            print(f"Save epoch {epoch+1}model in {config.save.save_ckpt}")
 
             
             if best_dice < dice:
                 print(f"Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
-                print(f"Save best model in {config.save_dir}")
+                print(f"Save best model in {config.save.save_ckpt}")
                 best_dice = dice
-                
-
-                if config.model.library == 'torchvision':
-                    save_model(model, file_name=f'{config.model.architecture.model_name}_best_model.pt', config=config)
-                else:
-                    save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
-
-
+                # base_model로 통일해서 삭제
+                save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
