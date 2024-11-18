@@ -40,7 +40,7 @@ class ConfigManager:
     def _save_config(self, config):
         kst = pytz.timezone('Asia/Seoul')
         base_model = config.model.architecture.base_model
-        epoch = config.train.max_epoch
+        epoch = config.data.train.max_epoch
         file_name = f"{base_model}_epoch{epoch}.yaml"
         folder_name = f"{datetime.datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')}_{base_model}"
         save_dir = os.path.join(config.save.save_config, folder_name)
