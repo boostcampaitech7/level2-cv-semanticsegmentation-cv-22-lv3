@@ -3,7 +3,7 @@ from utils.Dataset.dataloader import get_train_val_loader
 import argparse
 from model.model_loader import model_loader
 from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
-from train.trainer import load_config
+from configs.utils import ConfigManager
 
 def do_train(cfg):
     if cfg.debug:
@@ -45,22 +45,14 @@ if __name__ == "__main__":
     parser.add_argument('--encoder', type=str, 
                         default=None, 
                         help='Path to the encoder config file')
-    parser.add_argument('--save_dir', type=str, 
-                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/basemodel', 
-                        help='Path to the model save_dir')
-    parser.add_argument('--save_config', type=str, 
-                        default='/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs/exp_config.yaml', 
-                        help='Path to the config file')
 
     args = parser.parse_args()
-
-    # 설정 파일 로드
-    # config_train = OmegaConf.load(args.config_train)
-    config = load_config(base_config=args.config,
+    
+    config_manager = ConfigManager(base_config=args.config,
                          model_config=args.model,
-                         encoder_config=args.encoder,
-                         save_config=args.save_config,
-                         save_dir=args.save_dir)
+                         encoder_config=args.encoder)
+    
+    config = config_manager.load_config()
 
     # do_train(config_train, config)
     do_train(config)

@@ -44,8 +44,6 @@ def _set_num_classes(module, num_classes):
         print(f"Modified {module.__class__.__name__} '{last_conv_name}' out_channels to {num_classes}.")
 
 
-import torch.nn as nn
-
 def modify_deeplabv3_model(model, num_classes):
     # classifier 수정
     if hasattr(model, 'classifier'):

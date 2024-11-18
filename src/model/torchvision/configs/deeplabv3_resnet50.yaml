@@ -1,6 +1,5 @@
 model:
   library: "torchvision"
   architecture:
-    model_name: "deeplabv3_resnet50"
-    num_classes: 29
+    base_model: "deeplabv3_resnet50"
     pretrained: True
