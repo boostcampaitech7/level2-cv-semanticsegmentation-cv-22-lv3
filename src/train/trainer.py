@@ -199,10 +199,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, config):
                     print(f"Stage{stage} Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
                     print(f"Stage{stage} Save best model in {config.save.save_ckpt}")
                     best_dice = dice
-                    epochs_no_improve = 0
                     
+                    epochs_no_improve = 0
+
                     save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
-                    best_model_filename = f'{config.model.architecture.base_name}_best_model.pt'
+                    best_model_filename = f'{config.model.architecture.base_model}_best_model.pt'
                     best_model_path = os.path.join(config.save.save_ckpt, best_model_filename)
                     best_artifact = wandb.Artifact('best-model', type='model')
                     best_artifact.add_file(best_model_path)
