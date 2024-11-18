@@ -11,9 +11,9 @@ from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer
 
 def do_train(cfg, project_name, run_name):
     if cfg.debug:
-        cfg.train.max_epoch = 2
-        cfg.train.print_step = 1
-        cfg.val.interval = 1
+        cfg.data.train.max_epoch = 2
+        cfg.data.train.print_step = 1
+        cfg.data.valid.interval = 1
 
 
     model, _ = model_loader(cfg)

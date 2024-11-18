@@ -28,7 +28,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
             optimizer
             config
     '''
-    print(f'max_epoch: {config.train.max_epoch},valid & save_interval: {config.val.interval}')
+    print(f'max_epoch: {config.data.train.max_epoch},valid & save_interval: {config.data.valid.interval}')
     print(f'Start training..')
 
     set_seed(config.seed)
@@ -37,8 +37,8 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
     best_dice = 0.0
     
     epochs_no_improve = 0
-    patience = config.train.early_stopping_patience 
-    delta = config.train.early_stopping_delta  
+    patience = config.data.train.early_stopping_patience 
+    delta = config.data.train.early_stopping_delta  
 
 
     os.makedirs(config.save.save_ckpt, exist_ok=True)
@@ -46,11 +46,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
 
     for stage in range(1, 3):
         if stage == 1 :
-            stage_epoch = int(config.train.max_epoch * config.train.ratio)
+            stage_epoch = int(config.data.train.max_epoch * config.data.train.ratio)
             stage_trainloader = train_loader
             stage_valloader = val_loader
         else:
-            stage_epoch = config.train.max_epoch - int(config.train.max_epoch * config.train.ratio) 
+            stage_epoch = config.data.train.max_epoch - int(config.data.train.max_epoch * config.data.train.ratio) 
             stage_trainloader = val_loader
             stage_valloader = train_loader
 
@@ -77,17 +77,17 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
                 optimizer.step()
                 
 
-                if (step + 1) % config.train.print_step == 0:
+                if (step + 1) % config.data.train.print_step == 0:
                     print(
                         f'{datetime.datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")} || '
-                        f'Stage{stage} || Epoch [{epoch+1}/{int(config.train.max_epoch * config.train.ratio)}] | '
+                        f'Stage{stage} || Epoch [{epoch+1}/{int(config.data.train.max_epoch * config.data.train.ratio)}] | '
                         f'Step [{step+1}/{len(stage_trainloader)}] | '
                         f'Loss: {round(loss.item(),4)}'
                     )
                     wandb.log({'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
                 
 
-            if (epoch + 1) % config.val.interval == 0:
+            if (epoch + 1) % config.data.valid.interval == 0:
                 dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)
 
 
