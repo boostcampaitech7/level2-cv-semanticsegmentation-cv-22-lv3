@@ -15,7 +15,7 @@ def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
     torch.save(model.state_dict(), save_path)
 
 
-def train(model, train_loader, val_loader, criterion, optimizer, config) -> None:
+def train(model, train_loader, val_loader, criterion, optimizer, scheduler, config) -> None:
     '''
         summary : We train the model using a two-stage approach. 
             No. 1: Learn with train and verify with val
@@ -85,7 +85,9 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
                         f'Loss: {round(loss.item(),4)}'
                     )
                     wandb.log({'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
-                
+            
+            # 각 epoch이 끝난 후 스케쥴러 업데이트
+            scheduler.step()   
 
             if (epoch + 1) % config.data.valid.interval == 0:
                 dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)

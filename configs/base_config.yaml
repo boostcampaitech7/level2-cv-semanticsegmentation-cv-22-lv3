@@ -1,3 +1,4 @@
+# 데이터 및 훈련 관련 설정
 data :
   train_data_path : '/data/ephemeral/home/data/train/DCM'
   train_label_path : '/data/ephemeral/home/data/train/outputs_json'
@@ -34,7 +35,7 @@ data :
     num_workers : 2
     pin_memory : True
     drop_last : False
-    interval: 10
+    interval: 10  # validation 및 체크포인트 저장 주기
     threshold: 0.5
   
 
@@ -85,23 +86,84 @@ save:
   # 체크포인트 저장 경로
   save_ckpt: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints
 
+
 seed: 42
+
+
 loss_func: 
+  # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss
   name: BCEWithLogitsLoss
+
+loss_func_defaults:
+  BCEWithLogitsLoss: {}
+  DiceLoss:
+    mode: multilabel
+  JaccardLoss:
+    mode: multilabel
+  FocalLoss:
+    mode: multilabel
+    alpha: 0.25
+    gamma: 0.2    
+
+
 optimizer: 
   name: Adam
-  lr: 1e-4
-  weight_decay: 1e-6
+  params: {}
 
-# 추후에 설정
-# scheduler:
-  # name: CosineAnnealingLR
-  # T_max: 50
-  # eta_min: 0  # default
-  # last_epoch: -1  # default
+optimizer_defaults:
+  Adam:
+    lr: 1e-4
+    weight_decay: 1e-6
+  SGD:
+    lr: 1e-4
+    momentum: 0.9
+    weight_decay: 1e-6
+
+
+scheduler:
+  # CosineAnnealingLR, StepLR, ReduceLROnPlateau, ExponentialLR, MultiStepLR, CosineAnnealingWarmRestarts
+  name: CosineAnnealingLR
+  params:
+    T_max: 50
+
+scheduler_defaults:
+  CosineAnnealingLR:
+    T_max: 100
+    eta_min: 0  # default
+    last_epoch: -1  # default
+  StepLR:
+    step_size: 20
+    gamma: 0.1
+    last_epoch: -1
+  ReduceLROnPlateau:
+    mode: min
+    factor: 0.1
+    patience: 10
+    threshold: 0.0001
+    cooldown: 0
+    min_lr: 0
+    eps: 1e-8
+  ExponentialLR:
+    gamma: 0.1
+    last_epoch: -1
+  MultiStepLR:
+    # 특정 에폭에서 학습률을 감소
+    milestones: [30, 60, 90]
+    gamma: 0.1
+    last_epoch: -1
+  CosineAnnealingWarmRestarts:
+    # 학습률을 코사인 곡선을 따라 감소시키다가 설정된 주기마다 다시 초기 학습률로 "재시작"하는 방식
+    T_0: 10  # 첫 번째 주기의 길이
+    T_mult: 1  # 각 주기마다 늘리는 비율
+    eta_min: 0  # 학습률이 도달할 수 있는 최저값
+    last_epoch: -1  # 스케줄러가 몇 번째 epoch에서 시작해야 하는지 
+
 
 # 디버깅 모드
 debug: False
+
+
+# Inference 관련 설정
 inference:
   threshold: 0.5
   output_size: [2048, 2048]  # 튜플을 리스트로 수정
