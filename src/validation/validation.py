@@ -58,13 +58,11 @@ def validation(epoch, model, data_loader, criterion, config=None):
             
 
             outputs = torch.sigmoid(outputs)
-            outputs = (outputs > config.data.valid.threshold).detach().cpu()
-            masks = masks.detach().cpu()   
+            outputs = (outputs > config.data.valid.threshold)
             
 
             dice = dice_coef(outputs, masks)  
-            dices.append(dice)
-
+            dices.append(dice.detach().cpu())
 
     dices = torch.cat(dices, 0)
     dices_per_class = torch.mean(dices, 0)
