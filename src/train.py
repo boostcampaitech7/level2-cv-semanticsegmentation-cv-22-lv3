@@ -3,7 +3,7 @@ import argparse
 from train.trainer import train
 from omegaconf import OmegaConf
 from utils.set_seed import set_seed
-from configs.utils import ConfigManager
+from utils.utils_configs import ConfigManager
 from model.model_loader import model_loader
 from Dataset.dataloader import get_train_val_loader
 from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
@@ -31,12 +31,12 @@ def do_train(cfg, project_name, run_name):
 
 
     # Scheduler 선택
-    # scheduler = lr_scheduler_loader(cfg, optimizer)
+    scheduler = lr_scheduler_loader(cfg, optimizer)
 
 
     set_seed(cfg.seed)
     train_loader, val_loader = get_train_val_loader(cfg)
-    train(model, train_loader, val_loader, criterion, optimizer, cfg)
+    train(model, train_loader, val_loader, criterion, optimizer, scheduler, cfg)
     wandb.finish()
 
 
