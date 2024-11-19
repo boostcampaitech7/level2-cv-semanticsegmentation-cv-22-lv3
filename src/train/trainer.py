@@ -46,7 +46,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
 
     for stage in range(1, 3):
         if stage == 1 :
-            stage_epoch = int(config.data.train.max_epoch * config.data.train.ratio)
+            stage_epoch = int(config.data.train.max_epoch)
             stage_trainloader = train_loader
             stage_valloader = val_loader
         else:
@@ -84,10 +84,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                         f'Step [{step+1}/{len(stage_trainloader)}] | '
                         f'Loss: {round(loss.item(),4)}'
                     )
+                    
+                    
                     wandb.log({'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
             
-            # 각 epoch이 끝난 후 스케쥴러 업데이트
             scheduler.step()   
+
 
             if (epoch + 1) % config.data.valid.interval == 0:
                 dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)
