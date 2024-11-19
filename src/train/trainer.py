@@ -46,7 +46,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, config) -> None
 
     for stage in range(1, 3):
         if stage == 1 :
-            stage_epoch = int(config.data.train.max_epoch * config.data.train.ratio)
+            stage_epoch = int(config.data.train.max_epoch)
             stage_trainloader = train_loader
             stage_valloader = val_loader
         else:
