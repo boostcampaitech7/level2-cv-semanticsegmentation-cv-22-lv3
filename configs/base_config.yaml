@@ -34,8 +34,16 @@ data :
     num_workers : 2
     pin_memory : True
     drop_last : False
-    interval: 10
+    interval: 5
     threshold: 0.5
+
+    interpolate:
+      nearest: 'nearest'
+      bilinear: 'bilinear'
+      bicubic: 'bicubic'
+      area: 'area'
+      lanczos: 'lanczos'
+
   
 
   test : 
