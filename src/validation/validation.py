@@ -1,9 +1,6 @@
-import time
 import torch
-import random
 import wandb
-import numpy as np
-from datetime import timedelta
+import random
 from tqdm.auto import tqdm
 import torch.nn.functional as F
 from utils.metrics import dice_coef
@@ -21,78 +18,66 @@ def validation(epoch, model, data_loader, criterion, config=None):
     total_loss = 0
     cnt = 0
 
-    
-    images_to_visualize = []
     preds_to_visualize = []
     masks_to_visualize = []
 
-    val_start = time.time()
     with torch.no_grad():
-        n_class = len(config.data.classes)
         total_loss = 0
         cnt = 0
 
         for _, (images, masks) in tqdm(enumerate(data_loader), total=len(data_loader)):
-            # 이미지를 GPU로 옮김
             images, masks = images.cuda(), masks.cuda()
-
+            
 
             outputs = get_model_output(model, config.model.library, images)
+            
 
-            # 출력 텐서의 높이와 너비 저장
             output_h, output_w = outputs.size(-2), outputs.size(-1)
-            # 실제 마스크 텐서의 높이와 너비 저장
             mask_h, mask_w = masks.size(-2), masks.size(-1)
             
-            # 출력과 마스크 크기가 다를 경우 출력 크기를 마스크 크기로 보간하여 조정
+
             if output_h != mask_h or output_w != mask_w:
-                outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode="bilinear")
+                outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode = config.data.valid.interpolate.bilinear)
             
- 
+
             loss = criterion(outputs, masks)
-            total_loss += loss.item()
+            total_loss += loss
             cnt += 1
-            
-            # softmax는 각 클래스 확률의 합이 1이 되도록 하므로 적절하지 않음
-            # outputs = torch.softmax(outputs, dim=1)
 
-            # 출력에 sigmoid 활성화 함수 적용하여 확률 값으로 변환
-            outputs = torch.sigmoid(outputs)            
-            # 임계값 기준으로 이진화하여 0 또는 1로 변환
-            outputs = (outputs > config.data.valid.threshold).float()
-                        
-            preds = outputs.detach().cpu()
-            gt = masks.detach().cpu()
-            
-            # metrics.py에서 dice_coef 함수 수정
-            # dice = dice_coef(gt, preds, num_classes=n_class)  
-            # CPU로 넘기지 말고 그대로 GPU에서 진행   
-            dice = dice_coef(outputs, masks)
-            dices.append(dice.detach().cpu())
-                
-   
-            if len(images_to_visualize) < 5:
-                num_needed = 5 - len(images_to_visualize)
+
+            pred_classes = torch.argmax(outputs, dim=1)
+            if len(preds_to_visualize) < 5:
                 batch_size = images.size(0)
+                indices = list(range(batch_size))
+                random.shuffle(indices)
+                num_needed = 5 - len(preds_to_visualize)
                 num_to_take = min(num_needed, batch_size)
-                images_to_visualize.extend(images[:num_to_take].cpu())
-                preds_to_visualize.extend(preds[:num_to_take].cpu())
-                masks_to_visualize.extend(gt[:num_to_take].cpu())
+                for i in indices[:num_to_take]:
+                    preds_to_visualize.append(pred_classes[i].cpu())
+                    masks_to_visualize.append(masks[i].cpu())
+            
 
-    val_end = time.time() - val_start
-    avg_loss = total_loss / cnt
-    dices = torch.cat(dices, dim=0) 
-    dices_per_class = dices.mean(dim=0)  
-    avg_dice = dices_per_class.mean().item()
+            outputs = torch.sigmoid(outputs)
+            outputs = (outputs > config.data.valid.threshold).detach().cpu()
+            masks = masks.detach().cpu()   
+            
 
-    print("Elapsed time: {}\n".format(timedelta(seconds=val_end)))
-    print(f'Epoch [{epoch}], Validation Loss: {avg_loss:.4f}, Average Dice Coefficient: {avg_dice:.4f}')
-    for idx, cls in enumerate(config.data.classes):
-        print(f"{cls:<12}: {dices_per_class[idx].item():.4f}")
+            dice = dice_coef(outputs, masks)  
+            dices.append(dice)
 
 
+    dices = torch.cat(dices, 0)
+    dices_per_class = torch.mean(dices, 0)
+    dice_str = [
+        f"{c:<12} : {d.item():.4f}"
+        for c, d in zip(config.data.classes, dices_per_class)
+    ]
+    dice_str = '\n'.join(dice_str)
+    print(dice_str)
+
+
+    avg_dice = torch.mean(dices_per_class).item()
     wandb.log({
-        "validation_loss": avg_loss,
         "validation_avg_dice": avg_dice,
         "epoch": epoch
     })
@@ -102,12 +87,17 @@ def validation(epoch, model, data_loader, criterion, config=None):
     dice_dict['epoch'] = epoch
     wandb.log(dice_dict)
 
-  
-    # if len(images_to_visualize) > 0:
-    #     figures = visualize_predictions(images_to_visualize, preds_to_visualize, masks_to_visualize, max_visualize=5)
 
+    if len(preds_to_visualize) > 0:
+        figures = []
+        for pred, mask in zip(preds_to_visualize, masks_to_visualize):
+            print(
+                f'shape of pred : {pred.shape}',
+                f'shape of mask : {mask.shape}'
+            )
+            fig = visualize_predictions(pred, mask) 
+            figures.append(wandb.Image(fig, caption=f"Epoch: {epoch}"))
+        wandb.log({"validation_results": figures, "epoch": epoch})
 
-    #     if figures:
-    #         wandb.log({"validation_results": figures, "epoch": epoch})
 
     return avg_dice
