@@ -1,6 +1,7 @@
 import torch
 import wandb
 import random
+import numpy as np
 from tqdm.auto import tqdm
 import torch.nn.functional as F
 from utils.metrics import dice_coef
@@ -43,26 +44,48 @@ def validation(epoch, model, data_loader, criterion, config=None):
             loss = criterion(outputs, masks)
             total_loss += loss
             cnt += 1
+            
+
+            outputs = torch.sigmoid(outputs)
+            thr = config.data.valid.threshold 
+            outputs = (outputs > thr).detach().cpu()  
+            masks = masks.detach().cpu()  
+
+           
+            if masks.ndim == 3:
+                num_classes = len(config.data.classes)
+                masks_one_hot = np.eye(num_classes)[masks.numpy()]  
+                masks_one_hot = masks_one_hot.transpose(0, 3, 1, 2)  
+            else:
+                masks_one_hot = masks.numpy()  
 
 
-            pred_classes = torch.argmax(outputs, dim=1)
             if len(preds_to_visualize) < 5:
-                batch_size = images.size(0)
+                batch_size = outputs.shape[0]
                 indices = list(range(batch_size))
                 random.shuffle(indices)
                 num_needed = 5 - len(preds_to_visualize)
                 num_to_take = min(num_needed, batch_size)
-                for i in indices[:num_to_take]:
-                    preds_to_visualize.append(pred_classes[i].cpu())
-                    masks_to_visualize.append(masks[i].cpu())
-            
+                selected_indices = indices[:num_to_take]
 
-            outputs = torch.sigmoid(outputs)
-            outputs = (outputs > config.data.valid.threshold)
+                for i in selected_indices:
+                    preds_to_visualize.append(outputs[i].numpy())  
+                    masks_to_visualize.append(masks_one_hot[i])  
+
+
+            if len(masks_to_visualize) < 5:
+                batch_size = masks_one_hot.shape[0]
+                indices = list(range(batch_size))
+                random.shuffle(indices)
+                num_needed = 5 - len(masks_to_visualize)
+                num_to_take = min(num_needed, batch_size)
+                for i in indices[:num_to_take]:
+                    masks_to_visualize.append(masks_one_hot[i])  
             
 
             dice = dice_coef(outputs, masks)  
-            dices.append(dice.detach().cpu())
+            dices.append(dice)
+
 
     dices = torch.cat(dices, 0)
     dices_per_class = torch.mean(dices, 0)
