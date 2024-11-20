@@ -45,6 +45,14 @@ def optimizer_loader(config, model_parameters):
         return optim.Adam(params=model_parameters, **optimizer_params)
     elif optimizer_name == "SGD":
         return optim.SGD(model_parameters, **optimizer_params)
+    elif optimizer_name == "AdamW":
+        return optim.AdamW(params=model_parameters, **optimizer_params)
+    elif optimizer_name == "RMSprop":
+        return optim.RMSprop(params=model_parameters, **optimizer_params)
+    elif optimizer_name == "Adagrad":
+        return optim.Adagrad(params=model_parameters, **optimizer_params)
+    elif optimizer_name == "Adadelta":
+        return optim.Adadelta(params=model_parameters, **optimizer_params)
     else:
         raise ValueError(f"Unsupported optimizer: {optimizer_name}")
     
