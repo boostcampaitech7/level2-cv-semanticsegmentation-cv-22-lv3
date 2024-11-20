@@ -115,6 +115,7 @@ loss_func_defaults:
 
 
 optimizer: 
+# Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
   name: AdamW
   params:
     lr: 1e-4
