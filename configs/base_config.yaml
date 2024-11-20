@@ -115,8 +115,13 @@ loss_func_defaults:
 
 
 optimizer: 
-  name: Adam
-  params: {}
+  name: AdamW
+  params:
+    lr: 1e-4
+    weight_decay: 1e-2
+    betas: [0.9, 0.999]
+    eps: 1e-08
+    amsgrad: false
 
 optimizer_defaults:
   Adam:
@@ -126,6 +131,23 @@ optimizer_defaults:
     lr: 1e-4
     momentum: 0.9
     weight_decay: 1e-6
+  AdamW:
+    lr: 1e-4
+    weight_decay: 1e-2  # AdamW는 weight_decay를 상대적으로 더 크게 설정하는 것이 일반적
+  RMSprop:
+    lr: 1e-4
+    alpha: 0.99        # smoothing constant
+    momentum: 0.9
+    weight_decay: 1e-6
+  Adagrad:
+    lr: 1e-2           # Adagrad는 보통 비교적 큰 학습률로 시작
+    weight_decay: 1e-6
+    initial_accumulator_value: 0.1
+  Adadelta:
+    lr: 1.0            # Adadelta는 보통 기본값이 1.0
+    rho: 0.9           # decay rate
+    eps: 1e-6
+    weight_decay: 0    # 일반적으로 Adadelta는 weight_decay를 사용하지 않음
 
 
 scheduler:
@@ -137,8 +159,8 @@ scheduler:
 scheduler_defaults:
   CosineAnnealingLR:
     T_max: 100
-    eta_min: 0  # default
-    last_epoch: -1  # default
+    eta_min: 0        # default
+    last_epoch: -1    # default
   StepLR:
     step_size: 20
     gamma: 0.1
@@ -161,10 +183,10 @@ scheduler_defaults:
     last_epoch: -1
   CosineAnnealingWarmRestarts:
     # 학습률을 코사인 곡선을 따라 감소시키다가 설정된 주기마다 다시 초기 학습률로 "재시작"하는 방식
-    T_0: 10  # 첫 번째 주기의 길이
-    T_mult: 1  # 각 주기마다 늘리는 비율
-    eta_min: 0  # 학습률이 도달할 수 있는 최저값
-    last_epoch: -1  # 스케줄러가 몇 번째 epoch에서 시작해야 하는지 
+    T_0: 10           # 첫 번째 주기의 길이
+    T_mult: 1         # 각 주기마다 늘리는 비율
+    eta_min: 0        # 학습률이 도달할 수 있는 최저값
+    last_epoch: -1    # 스케줄러가 몇 번째 epoch에서 시작해야 하는지 
 
 
 # 디버깅 모드
