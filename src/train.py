@@ -16,7 +16,7 @@ def do_train(cfg, project_name, run_name):
         cfg.data.valid.interval = 1
 
 
-    model, _ = model_loader(cfg)
+    model = model_loader(cfg)
     criterion = loss_func_loader(cfg)
     optimizer = optimizer_loader(cfg, model.parameters())
 
