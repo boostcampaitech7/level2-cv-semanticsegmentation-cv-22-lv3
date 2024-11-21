@@ -22,7 +22,6 @@ def save_model(model, file_name='fcn_resnet50_best_model', config=None):
         model.save_pretrained(save_path)
         
 
-
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, config) -> None:
     '''
         summary : We train the model using a two-stage approach. 
@@ -88,13 +87,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                 if (step + 1) % config.data.train.print_step == 0:
                     print(
                         f'{datetime.datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S")} || '
-                        f'Stage{stage} || Epoch [{epoch+1}/{int(config.data.train.max_epoch * config.data.train.ratio)}] | '
+                        f'Stage{stage} || Epoch [{epoch+1}/{stage_epoch}] | '
                         f'Step [{step+1}/{len(stage_trainloader)}] | '
                         f'Loss: {round(loss.item(),4)}'
                     )
-                    
-                    
-                    wandb.log({'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
+                    wandb.log({f'Stage{stage} : train_loss' : loss.item(), 'Epoch' : epoch + 1 })
             
             scheduler.step()   
 
@@ -111,7 +108,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                     print(f"Stage{stage} Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}")
                     print(f"Stage{stage} Save best model in {config.save.save_ckpt}")
                     best_dice = dice
-                    epochs_no_improve = 0
+                    # epochs_no_improve = 0
 
 
                     save_model(model, file_name=f'{config.model.architecture.base_model}_best_model', config=config)

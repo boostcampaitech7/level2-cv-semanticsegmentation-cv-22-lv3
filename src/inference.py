@@ -69,25 +69,29 @@ def do_inference(cfg, mode):
     model = model_loader(cfg)
     checkpoint_path = cfg.inference.checkpoint_path
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    try:
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        checkpoint = torch.load(checkpoint_path, map_location=device) if library == 'torchvision' else smp.from_pretrained(checkpoint_path)
-
-
-        if isinstance(checkpoint, dict):
-            if 'state_dict' in checkpoint:
-                model.load_state_dict(checkpoint['state_dict'])
-            else:
-                model.load_state_dict(checkpoint)
-        else:
-            model = checkpoint
+    # try:  
+    #     checkpoint = torch.load(checkpoint_path, map_location=device) if library == 'torchvision' else smp.from_pretrained(checkpoint_path)
 
 
-        print(f"Checkpoint loaded successfully from: {checkpoint_path}")
-    except Exception as e:
-        print(f"Error loading checkpoint: {e}")
-        raise
+    #     if isinstance(checkpoint, dict):
+    #         if 'state_dict' in checkpoint:
+    #             model.load_state_dict(checkpoint['state_dict'])
+    #             print("Loaded state_dict from checkpoint.")
+    #         else:
+    #             model.load_state_dict(checkpoint)
+    #             print("Loaded state_dict directly from checkpoint.")
+    #     else:
+    #         raise ValueError("Unsupported checkpoint format. Expected a dict with 'state_dict' or a state_dict directly.")
+
+
+
+
+    #     print(f"Checkpoint loaded successfully from: {checkpoint_path}")
+    # except Exception as e:
+    #     print(f"Error loading checkpoint: {e}")
+    #     raise
 
 
     try:
