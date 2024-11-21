@@ -1,6 +1,6 @@
 import os
 import pytz
-import datetime
+from datetime import datetime
 from omegaconf import OmegaConf
 
 
@@ -39,13 +39,15 @@ class ConfigManager:
 
     def _save_config(self, config):
         kst = pytz.timezone('Asia/Seoul')
+        timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
         base_model = config.model.architecture.base_model
+        encoder = config.model.architecture.encoder_name
         epoch = config.data.train.max_epoch
         file_name = f"{base_model}_epoch{epoch}.yaml"
-        folder_name = f"{datetime.datetime.now(kst).strftime('%Y-%m-%d %H:%M:%S')}_{base_model}"
+        folder_name = f"{timestamp}_{base_model}_{encoder}_cfg"
+
         save_dir = os.path.join(config.save.save_config, folder_name)
         os.makedirs(save_dir, exist_ok=True)
-        
 
         save_path = os.path.join(save_dir, file_name)
         OmegaConf.save(config, save_path)
@@ -54,8 +56,10 @@ class ConfigManager:
 
     def _save_ckpt(self, config):
         kst = pytz.timezone('Asia/Seoul')
+        timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
         base_model = config.model.architecture.base_model
-        folder_name = f"{base_model}_{datetime.datetime.now(kst).strftime('%Y-%m-%d %H-%M-%S')}_ckpt"
+        encoder = config.model.architecture.encoder_name
+        folder_name = f"{timestamp}_{base_model}_{encoder}_ckpt"
         save_ckpt_dir = os.path.join(config.save.save_ckpt, folder_name)
         os.makedirs(save_ckpt_dir, exist_ok=True)
         config.save['save_ckpt'] = save_ckpt_dir

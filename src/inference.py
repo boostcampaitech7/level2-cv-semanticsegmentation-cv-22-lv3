@@ -66,7 +66,7 @@ def do_inference(cfg, mode):
     IND2CLASS = {v: k for k, v in CLASS2IND.items()}
 
 
-    model, _ = model_loader(cfg)
+    model = model_loader(cfg)
     checkpoint_path = cfg.inference.checkpoint_path
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
