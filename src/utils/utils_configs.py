@@ -1,6 +1,6 @@
 import os
 import pytz
-import datetime
+from datetime import datetime
 from omegaconf import OmegaConf
 
 
