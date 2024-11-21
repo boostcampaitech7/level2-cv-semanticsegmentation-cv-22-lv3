@@ -7,7 +7,7 @@ import torch.nn.functional as F
 from utils.metrics import dice_coef
 from utils.set_seed import set_seed
 from model.utils.model_output import get_model_output
-from Dataset.visualization.train_vis import visualize_predictions
+from Dataset.visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
 def validation(epoch, model, data_loader, criterion, config=None):
@@ -50,41 +50,14 @@ def validation(epoch, model, data_loader, criterion, config=None):
             thr = config.data.valid.threshold 
             outputs = (outputs > thr).detach().cpu()  
             masks = masks.detach().cpu()  
-
-           
-            if masks.ndim == 3:
-                num_classes = len(config.data.classes)
-                masks_one_hot = np.eye(num_classes)[masks.numpy()]  
-                masks_one_hot = masks_one_hot.transpose(0, 3, 1, 2)  
-            else:
-                masks_one_hot = masks.numpy()  
-
-
-            if len(preds_to_visualize) < 5:
-                batch_size = outputs.shape[0]
-                indices = list(range(batch_size))
-                random.shuffle(indices)
-                num_needed = 5 - len(preds_to_visualize)
-                num_to_take = min(num_needed, batch_size)
-                selected_indices = indices[:num_to_take]
-
-                for i in selected_indices:
-                    preds_to_visualize.append(outputs[i].numpy())  
-                    masks_to_visualize.append(masks_one_hot[i])  
-
-
-            if len(masks_to_visualize) < 5:
-                batch_size = masks_one_hot.shape[0]
-                indices = list(range(batch_size))
-                random.shuffle(indices)
-                num_needed = 5 - len(masks_to_visualize)
-                num_to_take = min(num_needed, batch_size)
-                for i in indices[:num_to_take]:
-                    masks_to_visualize.append(masks_one_hot[i])  
             
+            
+            preds_to_visualize, masks_to_visualize = save_image_for_visualization(config, masks, preds_to_visualize, outputs, masks_to_visualize)
+
 
             dice = dice_coef(outputs, masks)  
             dices.append(dice)
+
 
 
     dices = torch.cat(dices, 0)
