@@ -9,10 +9,18 @@ from validation.validation import validation
 from model.utils.model_output import get_model_output
 
 
-def save_model(model, file_name='fcn_resnet50_best_model.pt', config=None):
+def save_model(model, file_name='fcn_resnet50_best_model', config=None):
+    library = config.model.library
+    file_name = f"{file_name}{'.pt' if library == 'torchvision' else ''}"
     save_ckpt = config.save.save_ckpt
     save_path = os.path.join(save_ckpt, file_name)
-    torch.save(model.state_dict(), save_path)
+
+    if library == 'torchvision':
+        torch.save(model.state_dict(), save_path)
+    # smp 모델일 경우
+    else:
+        model.save_pretrained(save_path)
+        
 
 
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, config) -> None:
@@ -95,7 +103,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                 dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)
 
 
-                save_model(model, file_name=f'epoch_{epoch+1}_model.pt', config=config)
+                save_model(model, file_name=f'epoch_{epoch+1}_model', config=config)
                 print(f"Save epoch {epoch+1}model in {config.save.save_ckpt}")
 
 
@@ -106,12 +114,12 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                     epochs_no_improve = 0
 
 
-                    save_model(model, file_name=f'{config.model.architecture.base_model}_best_model.pt', config=config)
-                    best_model_filename = f'{config.model.architecture.base_model}_best_model.pt'
-                    best_model_path = os.path.join(config.save.save_ckpt, best_model_filename)
-                    best_artifact = wandb.Artifact('best-model', type='model')
-                    best_artifact.add_file(best_model_path)
-                    wandb.log_artifact(best_artifact)
+                    save_model(model, file_name=f'{config.model.architecture.base_model}_best_model', config=config)
+                    # best_model_filename = f'{config.model.architecture.base_model}_best_model.pt'
+                    # best_model_path = os.path.join(config.save.save_ckpt, best_model_filename)
+                    # best_artifact = wandb.Artifact('best-model', type='model')
+                    # best_artifact.add_file(best_model_path)
+                    # wandb.log_artifact(best_artifact)
 
 
                 else:

@@ -9,10 +9,9 @@ from datetime import datetime
 import torch.nn.functional as F
 from omegaconf import OmegaConf
 from train.trainer import set_seed
+import segmentation_models_pytorch as smp
 from model.model_loader import model_loader
 from Dataset.dataloader import get_test_loader
-
-
 
 def encode_mask_to_rle(mask):
     pixels = mask.flatten()
@@ -60,19 +59,20 @@ def save_to_csv(filename_and_class, rles, cfg):
 
 def do_inference(cfg, mode):
     set_seed(cfg.seed)
+    library = cfg.model.library
 
 
     CLASS2IND = {v: i for i, v in enumerate(cfg.data.classes)}
     IND2CLASS = {v: k for k, v in CLASS2IND.items()}
 
 
-    model = model_loader(cfg)
+    model, _ = model_loader(cfg)
     checkpoint_path = cfg.inference.checkpoint_path
 
 
     try:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        checkpoint = torch.load(checkpoint_path, map_location=device)
+        checkpoint = torch.load(checkpoint_path, map_location=device) if library == 'torchvision' else smp.from_pretrained(checkpoint_path)
 
 
         if isinstance(checkpoint, dict):
