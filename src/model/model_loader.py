@@ -71,4 +71,4 @@ def model_loader(config):
         raise ValueError(f"Unknown library: {library_name}")
            
 
-    return model, base_model
+    return model
