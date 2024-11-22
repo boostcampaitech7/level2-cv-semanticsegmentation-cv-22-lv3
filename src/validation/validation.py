@@ -30,7 +30,7 @@ def validation(epoch, model, data_loader, criterion, config=None):
             images, masks = images.cuda(), masks.cuda()
             
 
-            outputs = get_model_output(model, config.model.library, images)
+            outputs = get_model_output(model, images)
             
 
             output_h, output_w = outputs.size(-2), outputs.size(-1)
