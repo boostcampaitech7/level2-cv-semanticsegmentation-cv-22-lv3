@@ -95,7 +95,7 @@ def do_inference(cfg):
             test_loader = get_test_loader(cfg)
             for images, image_names in tqdm(test_loader, total=len(test_loader), desc="Inference"):
                 images = images.to(device)
-                outputs = model(images)['out'] if isinstance(model(images), dict) else model(images)
+                outputs = get_model_output(model, images)
 
                 outputs = F.interpolate(outputs, size=output_size, mode=cfg.data.valid.interpolate.bilinear)
                 outputs = torch.sigmoid(outputs)

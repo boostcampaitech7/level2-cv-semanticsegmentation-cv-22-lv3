@@ -75,7 +75,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                 model = model.cuda()
                 
 
-                outputs = get_model_output(model, config.model.library, images)
+                outputs = get_model_output(model, images)
 
 
                 loss = criterion(outputs, masks)
