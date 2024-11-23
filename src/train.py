@@ -6,7 +6,7 @@ from utils.set_seed import set_seed
 from utils.utils_configs import ConfigManager
 from model.model_loader import model_loader
 from Dataset.dataloader import get_train_val_loader
-from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
+from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader, WeightedDiceLoss
 
 
 def do_train(cfg, project_name, run_name):
@@ -17,7 +17,8 @@ def do_train(cfg, project_name, run_name):
 
 
     model = model_loader(cfg)
-    criterion = loss_func_loader(cfg)
+    # criterion = loss_func_loader(cfg)
+    criterion = WeightedDiceLoss(weight_inside=1.0, weight_boundary=2.0)
     optimizer = optimizer_loader(cfg, model.parameters())
 
 
