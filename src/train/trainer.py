@@ -76,7 +76,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
 
                 optimizer.zero_grad()
 
-                outputs = model(images)  
+                outputs = get_model_output(images)  
 
                 loss = criterion(outputs, masks, weight_maps)
                 loss.backward()
