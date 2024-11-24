@@ -94,94 +94,168 @@ def lr_scheduler_loader(config, optimizer):
 
 
 
+''' 아직 config 파일로 설정하지 않아서 이는 나중에 수정할 계획입니다
+    hybrid loss를 설정하기 위해서 총 3개의 loss를 직접 구현
+    - WeightedFocalLoss
+    - WeightedBCEWithLogitsLoss
+    - WeightedDiceLoss
 
+    위의 3가지 loss를 모두 고려해서 하나의 loss값을 전달한다
+'''
 
-
-import numpy as np
-import cv2
 import torch
-from scipy.ndimage import distance_transform_edt
+import torch.nn as nn
+import torch.nn.functional as F
 
+class WeightedFocalLoss(nn.Module):
+    def __init__(self, alpha=None, gamma=2.0, smooth=1e-6, reduction='mean'):
+        """
+        Args:
+            alpha (float or list, optional): Weighting factor for the classes. If a list, it should have length equal to number of classes.
+            gamma (float): Focusing parameter for modulating factor (1-p).
+            smooth (float): Smoothing factor to avoid division by zero.
+            reduction (str): Specifies the reduction to apply to the output: 'none' | 'mean' | 'sum'.
+        """
+        super(WeightedFocalLoss, self).__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+        self.smooth = smooth
+        self.reduction = reduction
 
-def create_weight_map(mask, boundary_width=5, weight_inside=1.0, weight_boundary=2.0):
-    '''
-        Args :
-            mask : 이진 마스크 (H, W)
-            boundary_width : 강조할 경계의 너비
-            weight_inside : 내부 픽셀의 가중치
-            weight_boundary : 경계 픽셀의 가중치
-    '''
-    mask = mask.astype(np.uint8)
-    kernel = np.ones((3,3), np.uint8)
-    
-    # 여러 번 침식하여 경계 너비 확대
-    boundary = mask.copy()
-    for _ in range(boundary_width):
-        eroded = cv2.erode(boundary, kernel, iterations=1)
-        boundary = boundary - eroded
-    
-    # 가중치 맵 초기화
-    weight_map = np.ones_like(mask, dtype=np.float32) * weight_inside
-    
-    # 경계 픽셀에 높은 가중치 할당
-    weight_map[boundary == 1] = weight_boundary
-    
-    return weight_map
+        if isinstance(alpha, (list, tuple)):
+            self.alpha = torch.tensor(alpha, dtype=torch.float32)
+        elif isinstance(alpha, float):
+            self.alpha = torch.tensor([alpha] * 29, dtype=torch.float32)  
+        elif alpha is None:
+            self.alpha = torch.ones(29, dtype=torch.float32)  
+        else:
+            raise TypeError("alpha must be float, list, tuple, or None")
+
+    def forward(self, logits, targets, weight_maps):
+        """
+        Args:
+            logits (torch.Tensor): Model outputs (N, C, H, W).
+            targets (torch.Tensor): Ground truth masks (N, C, H, W).
+            weight_maps (torch.Tensor): Weight maps (N, C, H, W).
+        Returns:
+            torch.Tensor: Computed Focal Loss.
+        """
+        device = logits.device
+        if isinstance(self.alpha, torch.Tensor):
+            self.alpha = self.alpha.to(device).view(1, -1, 1, 1)  # Shape: (1, C, 1, 1)
+
+        # Compute BCE with logits
+        BCE_loss = F.binary_cross_entropy_with_logits(logits, targets, reduction='none')  # (N, C, H, W)
+
+        # Compute probabilities
+        probs = torch.sigmoid(logits)  # (N, C, H, W)
+
+        # Compute the focal factor
+        focal_factor = (1 - probs) ** self.gamma  # (N, C, H, W)
+
+        # Apply alpha weighting
+        if self.alpha is not None:
+            BCE_loss = self.alpha * BCE_loss  # Broadcasting over N, H, W
+
+        # Compute the focal loss
+        focal_loss = focal_factor * BCE_loss  # (N, C, H, W)
+
+        # Apply weight maps
+        if weight_maps is not None:
+            focal_loss = focal_loss * weight_maps  # (N, C, H, W)
+
+        # Reduce the loss
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        else:
+            return focal_loss  # 'none'
+        
+
+class WeightedBCEWithLogitsLoss(nn.Module):
+    def __init__(self, smooth=1e-6):
+        '''
+            Args:
+                smooth (float): 안정성을 위한 작은 값
+        '''
+        super(WeightedBCEWithLogitsLoss, self).__init__()
+        self.smooth = smooth
+        self.bce = nn.BCEWithLogitsLoss(reduction='none')  # 개별 손실 계산을 위해 reduction='none' 사용
+
+    def forward(self, logits, targets, weight_maps):
+        '''
+            Args:
+                logits (torch.Tensor): 모델의 출력 로짓 (N, C, H, W)
+                targets (torch.Tensor): 실제 마스크 (N, C, H, W)
+                weight_maps (torch.Tensor): 가중치 맵 (N, C, H, W)
+        '''
+        loss = self.bce(logits, targets)
+        
+        weighted_loss = loss * weight_maps
+        
+        return weighted_loss.mean()
 
 
 class WeightedDiceLoss(nn.Module):
-    def __init__(self, weight_inside=1.0, weight_boundary=2.0, smooth=1e-6):
+    def __init__(self, smooth=1e-6):
         '''
-            Args :
-                weight_inside : 내부 픽셀의 가중치
-                weight_boundary : 경계 픽셀의 가중치
-                smooth : 분모가 0이 되는 것을 방지하기 위한 평활화 계수
+            Args:
+                smooth (float): 분모가 0이 되는 것을 방지하기 위한 평활화 계수
         '''
         super(WeightedDiceLoss, self).__init__()
+        self.smooth = smooth
+
+    def forward(self, logits, targets, weight_maps):
+        '''
+            Args:
+                logits (torch.Tensor): 모델의 출력 로짓 (N, C, H, W)
+                targets (torch.Tensor): 실제 마스크 (N, C, H, W)
+                weight_maps (torch.Tensor): 가중치 맵 (N, C, H, W)
+        '''
+        probs = torch.sigmoid(logits)
+
+        intersection = (probs * targets * weight_maps).sum(dim=(2,3))
+        union = (probs * weight_maps).sum(dim=(2,3)) + (targets * weight_maps).sum(dim=(2,3))
+
+        dice = (2. * intersection + self.smooth) / (union + self.smooth)
+
+        loss = 1 - dice
+        return loss.mean()
+    import torch
+import torch.nn as nn
+
+
+class CombinedWeightedLoss(nn.Module):
+    def __init__(self, dice_weight=1.0, bce_weight=1.0, focal_weight=1.0, 
+                 alpha=None, gamma=2.0, weight_inside=1.0, weight_boundary=2.0, smooth=1e-6):
+        
+        super(CombinedWeightedLoss, self).__init__()
+        self.dice_weight = dice_weight
+        self.bce_weight = bce_weight
+        self.focal_weight = focal_weight
         self.weight_inside = weight_inside
         self.weight_boundary = weight_boundary
         self.smooth = smooth
 
-    def forward(self, logits, targets):
-        '''
-            Args :
-                logits : 모델의 출력 로짓 (N, C, H, W)
-                targets : 실제 마스크 (N, C, H, W)
-        '''
-        # 시그모이드 활성화 적용하여 확률로 변환
-        probs = torch.sigmoid(logits)
+        self.dice = WeightedDiceLoss(smooth=smooth)
+        self.bce = WeightedBCEWithLogitsLoss(smooth=smooth)
+        self.focal = WeightedFocalLoss(alpha=alpha, gamma=gamma, smooth=smooth, reduction='mean')
 
-        N, C, H, W = probs.shape
-        loss = 0.0
+    def forward(self, logits, targets, weight_maps):
+        """
+        Args:
+            logits (torch.Tensor): Model outputs (N, C, H, W).
+            targets (torch.Tensor): Ground truth masks (N, C, H, W).
+            weight_maps (torch.Tensor): Weight maps (N, C, H, W).
+        Returns:
+            torch.Tensor: Combined loss.
+        """
+        dice_loss = self.dice(logits, targets, weight_maps)
+        bce_loss = self.bce(logits, targets, weight_maps)
+        focal_loss = self.focal(logits, targets, weight_maps)
 
-        # 각 클래스별로 손실 계산
-        for c in range(C):
-            probs_c = probs[:, c, :, :].contiguous().view(N, -1)  # (N, H*W)
-            targets_c = targets[:, c, :, :].contiguous().view(N, -1)  # (N, H*W)
-
-            # NumPy로 변환하여 가중치 맵 생성
-            probs_np = probs_c.detach().cpu().numpy()
-            targets_np = targets_c.detach().cpu().numpy()
-
-            weight_maps = []
-            for target in targets_np:
-                weight_map = create_weight_map(target)
-                weight_maps.append(weight_map)
-            weight_maps = np.stack(weight_maps)
-            weight_maps = torch.tensor(weight_maps, dtype=torch.float32).to(logits.device)
-
-            # 텐서 평탄화
-            weight_maps_flat = weight_maps.view(N, -1)  # (N, H*W)
-
-            # 가중치를 적용한 교집합과 합집합 계산
-            intersection = (probs_c * targets_c * weight_maps_flat).sum(dim=1)  # (N,)
-            union = (probs_c * weight_maps_flat).sum(dim=1) + (targets_c * weight_maps_flat).sum(dim=1)  # (N,)
-
-            # Dice 계수 계산
-            dice = (2. * intersection + self.smooth) / (union + self.smooth)  # (N,)
-
-            # 손실 누적 (평균)
-            loss += (1 - dice).mean()
-
-        # 클래스별 평균 손실 반환
-        return loss / C
+        total_loss = (self.dice_weight * dice_loss) + \
+                     (self.bce_weight * bce_loss) + \
+                     (self.focal_weight * focal_loss)
+        return total_loss
