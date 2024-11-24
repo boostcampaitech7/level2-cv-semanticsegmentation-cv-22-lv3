@@ -75,8 +75,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
                 weight_maps = weight_maps.cuda(non_blocking=True)
 
                 optimizer.zero_grad()
-
-                outputs = get_model_output(images)  
+                outputs = get_model_output(model, images)
 
                 loss = criterion(outputs, masks, weight_maps)
                 loss.backward()
