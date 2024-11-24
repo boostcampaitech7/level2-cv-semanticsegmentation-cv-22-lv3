@@ -6,7 +6,7 @@ from utils.set_seed import set_seed
 from utils.utils_configs import ConfigManager
 from model.model_loader import model_loader
 from Dataset.dataloader import get_train_val_loader
-from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader, WeightedDiceLoss
+from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader, CombinedWeightedLoss
 
 
 def do_train(cfg, project_name, run_name):
@@ -18,7 +18,10 @@ def do_train(cfg, project_name, run_name):
 
     model = model_loader(cfg)
     # criterion = loss_func_loader(cfg)
-    criterion = WeightedDiceLoss(weight_inside=1.0, weight_boundary=2.0)
+    '''
+        실험을 위해서 config를 설정하지 않고 단순히 CombineWeightedLoss를 설정해서 사용
+    '''
+    criterion = CombinedWeightedLoss(weight_inside=1.0, weight_boundary=2.0)
     optimizer = optimizer_loader(cfg, model.parameters())
 
 
@@ -30,8 +33,6 @@ def do_train(cfg, project_name, run_name):
     )
     wandb.watch(model, log = 'all')
 
-
-    # Scheduler 선택
     scheduler = lr_scheduler_loader(cfg, optimizer)
 
 
