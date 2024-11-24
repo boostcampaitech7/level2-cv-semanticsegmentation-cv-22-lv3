@@ -12,9 +12,6 @@ from typing import Dict, Any, Tuple
 from torch.utils.data import Dataset
 from Dataset.transform import get_transforms
 from Dataset.split_dataset.splitdata import split_data
-# from transform import get_transforms
-# from split_dataset.splitdata import split_data
-
 
 
 def load_config(config_path: str):
@@ -26,14 +23,12 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
     train_data_path = config.data.train_data_path
     train_label_path = config.data.train_label_path
 
-
     images = {
         os.path.relpath(os.path.join(root, fname), start = train_data_path)
         for root, _, files in os.walk(train_data_path)
         for fname in files
         if os.path.splitext(fname)[1].lower() == '.png'
     }
-
 
     labels = {
         os.path.relpath(os.path.join(root, fname), start = train_label_path)
@@ -42,14 +37,11 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
         if os.path.splitext(fname)[1].lower() == '.json'
     }
 
-
     jsons_fn_prefix = {os.path.splitext(fname)[0] for fname in labels}
     pngs_fn_prefix = {os.path.splitext(fname)[0] for fname in images}
 
-
     assert len(jsons_fn_prefix - pngs_fn_prefix) == 0
     assert len(pngs_fn_prefix - jsons_fn_prefix) == 0
-
 
     images = sorted(images)
     labels = sorted(labels)
@@ -82,7 +74,6 @@ class XRayDataset(Dataset):
             _imagenames = np.array(images)
             _labelnames = np.array(labels)
 
-
             left_right_group = [os.path.dirname(fname) for fname in _imagenames]
             imagenames, labelnames = split_data(
                 _imagenames, _labelnames, left_right_group,
@@ -90,23 +81,24 @@ class XRayDataset(Dataset):
                 split_method=config.data.get('split_method', 'GroupKFold')
             )
 
-            if config.debug == False :
+            if config.debug == False:
                 self.imagenames = imagenames
                 self.labelnames = labelnames
-
-
-            elif config.debug == True :
-                self.imagenames = images[ : 30]
-                self.labelnames = labelnames [ : 30]
-
+            elif config.debug == True:
+                self.imagenames = imagenames[:30]
+                self.labelnames = labelnames[:30]
 
         elif mode == 'test':
             self.imagenames, self.test_data_path = self.load_test_images(config)
             self.labelnames = []  
 
-
         else:
             raise ValueError("Invalid mode. Choose 'train', 'val', or 'test'.")
+
+
+        self.boundary_width = config.loss_func.get('boundary_width', 5)
+        self.weight_inside = config.loss_func.get('weight_inside', 1.0)
+        self.weight_boundary = config.loss_func.get('weight_boundary', 2.0)
 
 
     def load_test_images(self, config: Dict[str, Any]) -> Tuple[list, str]:
@@ -117,51 +109,59 @@ class XRayDataset(Dataset):
             for fname in files
             if os.path.splitext(fname)[1].lower() == '.png'
         ])
-
-
         return images, test_data_path
 
 
+    def create_weight_map(self, mask: np.ndarray) -> np.ndarray:
+        mask = mask.astype(np.uint8)
+        kernel = np.ones((3,3), np.uint8)
+        
+
+        boundary = mask.copy()
+        for _ in range(self.boundary_width):
+            eroded = cv2.erode(boundary, kernel, iterations=1)
+            boundary = boundary - eroded
+        
+
+        weight_map = np.ones_like(mask, dtype=np.float32) * self.weight_inside
+        weight_map[boundary == 1] = self.weight_boundary
+        return weight_map
+
+
     def __len__(self) -> int:
-
         return len(self.imagenames)
-    
 
-    def __getitem__(self, item : int) -> tuple[list[float], list[float]]:
-        image_name = self.imagenames[item]
+    def __getitem__(self, idx: int) -> tuple:
+        image_name = self.imagenames[idx]
 
         if self.mode == 'test':
             image_path = os.path.join(self.config.data.test_data_path, image_name)
             image = cv2.imread(image_path)
-            image = image / 255.
-
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
+            image = image / 255.0
 
             if self.transforms is not None:
                 inputs = {'image': image}
                 result = self.transforms(**inputs)
                 image = result['image']
 
-            image = image.transpose(2, 0, 1)
+            image = image.transpose(2, 0, 1)  
             image = torch.from_numpy(image).float()
 
             return image, image_name 
 
-
         else:
             image_path = os.path.join(self.config.data.train_data_path, image_name)
 
-
             image = cv2.imread(image_path)
-            image = image / 255 
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
+            image = image / 255.0
 
-
-            label_name = self.labelnames[item]
+            label_name = self.labelnames[idx]
             label_path = os.path.join(self.config.data.train_label_path, label_name)
             
-
             label_shape = tuple(image.shape[:2]) + (len(self.config.data.classes),)        
-            label = np.zeros(label_shape, dtype = np.uint8)
-
+            label = np.zeros(label_shape, dtype=np.uint8)
 
             with open(label_path , 'r') as f:
                 annotations = json.load(f)
@@ -175,37 +175,36 @@ class XRayDataset(Dataset):
                 class_id = CLASS2IND[c]
                 points = np.array(ann['points'])
 
-
-                class_label = np.zeros(image.shape[:2], dtype = np.uint8)
+                class_label = np.zeros(image.shape[:2], dtype=np.uint8)
                 cv2.fillPoly(class_label, [points], 1)
                 label[..., class_id] = class_label
 
-            
             if self.transforms is not None:
                 inputs = {'image': image, 'mask': label}
                 result = self.transforms(**inputs)
                 image = result['image']
                 label = result['mask']
-                
 
-            image = image.transpose(2, 0, 1)
-            label = label.transpose(2, 0, 1)
+            image = image.transpose(2, 0, 1)  
+            label = label.transpose(2, 0, 1) 
             image = torch.from_numpy(image).float()
             label = torch.from_numpy(label).float()
 
 
-            return image, label
-        
+            weight_maps = []
+            for c in range(label.shape[0]):
+                wm = self.create_weight_map(label[c].numpy())
+                weight_maps.append(wm)
+            weight_maps = np.stack(weight_maps) 
+            weight_maps = torch.from_numpy(weight_maps).float() 
+
+            return image, label, weight_maps
 
 
+'''
+    이미지 Dataset의 transform을 시각화 해보기 위해서 아래와 같이 시각화 하는 코드를 작성
+'''
 
-
-
-
-
-
-
-# PALETTE 정의
 PALETTE = [
     (220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230), (106, 0, 228),
     (0, 60, 100), (0, 80, 100), (0, 0, 70), (0, 0, 192), (250, 170, 30),
@@ -215,7 +214,6 @@ PALETTE = [
     (0, 125, 92), (209, 0, 151), (188, 208, 182), (0, 220, 176),
 ]
 
-# label을 RGB 이미지로 변환하는 함수
 def label2rgb(label):
     image_size = label.shape[1:] + (3,)
     image = np.zeros(image_size, dtype=np.uint8)
@@ -225,60 +223,54 @@ def label2rgb(label):
     
     return image
 
+
 if __name__ == "__main__":
+    import argparse
+    import matplotlib.pyplot as plt
+
     parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
     parser.add_argument('--config', type=str, default='configs/data_config.yaml', help='Path to the config file')
     args = parser.parse_args()
     config = load_config(args.config)
 
-
     train_transforms_config = config.get('augmentation', {}).get('train', [])
     valid_transforms_config = config.get('augmentation', {}).get('valid', [])
 
-
     train_transforms = get_transforms(train_transforms_config)
     valid_transforms = get_transforms(valid_transforms_config)
-
 
     train_dataset = XRayDataset(mode='train', transforms=train_transforms, config=config)
     valid_dataset = XRayDataset(mode='val', transforms=valid_transforms, config=config)
 
 
-    # After fetching the image and label
-    image, label = train_dataset[1]
-    print("Image shape:", image.shape)  # Should be (C, H, W)
-    print("Label shape:", label.shape)  # Should be (C, H, W)
+    image, label, _ = train_dataset[1]  
+    print("Image shape:", image.shape) 
+    print("Label shape:", label.shape) 
     print("Train dataset length:", len(train_dataset))
 
     # Create save directory
     save_dir = "/data/ephemeral/home/JSM_TEST_vis"
     os.makedirs(save_dir, exist_ok=True)
 
-    # Prepare image for visualization
-    image = image.permute(1, 2, 0).cpu().numpy()  # (H, W, C)
-    
 
-    # Handle different channel scenarios
+    image = image.permute(1, 2, 0).cpu().numpy()  
+
+
     if image.shape[2] == 1:
-        # Grayscale image
-        image = image.squeeze(axis=2)  # Remove the channel dimension
+        image = image.squeeze(axis=2)  
         cmap = 'gray'
         ax0_image = image
     else:
-        # Color image
-        # Ensure the image is in [0, 1] for floats
         if image.dtype != np.uint8:
             image = np.clip(image, 0, 1)
         image_rgb = (image * 255).astype(np.uint8) if image.dtype != np.uint8 else image
         image_rgb = cv2.cvtColor(image_rgb, cv2.COLOR_BGR2RGB)
-        image_rgb = (image * 255).astype(np.uint8)  # Float 이미지를 uint8로 변환
         ax0_image = image_rgb
-        cmap = None  # Default colormap
+        cmap = None 
 
-    # Convert label to RGB
     label_rgb = label2rgb(label.cpu().numpy())
 
-    # Visualization
+
     fig, ax = plt.subplots(1, 2, figsize=(24, 12))
     ax[0].imshow(ax0_image, cmap=cmap)
     ax[0].set_title("Original Image")
@@ -288,13 +280,8 @@ if __name__ == "__main__":
     ax[1].set_title("Predicted Segmentation")
     ax[1].axis('off')
 
-    # Save the visualization
     save_path = os.path.join(save_dir, "image_with_segmentation.png")
     plt.savefig(save_path, bbox_inches='tight')
     plt.close(fig)
 
-    print(f"Visualization saved at: {save_path}")
-
-
-
-    
+    print(f"Visualization weight map saved at: {save_path}")
