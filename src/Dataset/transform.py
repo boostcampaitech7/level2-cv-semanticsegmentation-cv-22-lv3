@@ -35,3 +35,4 @@ def get_transforms(augmentations_config) -> Callable:
           
                     
     return A.Compose(transforms_list)
+

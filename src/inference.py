@@ -73,12 +73,16 @@ def do_inference(cfg):
     CLASS2IND = {v: i for i, v in enumerate(cfg.data.classes)}
     IND2CLASS = {v: k for k, v in CLASS2IND.items()}
 
-    model = model_loader(cfg)    # 모델 선언
+
+    model = model_loader(cfg)
+
     checkpoint_path = cfg.inference.checkpoint_path
     device = torch.device('cuda') if cfg.inference.mode == 'gpu' else torch.device('cpu')
 
     try:  
         model = load_model(model, checkpoint_path, device, library)    # 모델 로드
+
+        print(f"Checkpoint loaded successfully from: {checkpoint_path}")
 
     except Exception as e:
         print(f"Error loading checkpoint: {e}")
@@ -90,6 +94,7 @@ def do_inference(cfg):
         rles = []
         filename_and_class = []
         output_size = tuple(map(int, cfg.inference.output_size))
+
 
         with torch.no_grad():
             test_loader = get_test_loader(cfg)
