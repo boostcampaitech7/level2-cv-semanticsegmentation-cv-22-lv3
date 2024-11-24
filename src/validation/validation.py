@@ -27,7 +27,9 @@ def validation(epoch, model, data_loader, criterion, config=None):
             masks = masks.cuda(non_blocking=True)
             weight_maps = weight_maps.cuda(non_blocking=True)
 
-            outputs = get_model_output(model, config.model.library, images)
+
+            outputs = get_model_output(model, images)
+            
 
             output_h, output_w = outputs.size(-2), outputs.size(-1)
             mask_h, mask_w = masks.size(-2), masks.size(-1)

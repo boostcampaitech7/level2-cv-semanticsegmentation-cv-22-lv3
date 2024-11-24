@@ -225,3 +225,4 @@ inference:
   output_size: [1024, 1024]  # 튜플을 리스트로 수정
   checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/lraspp_mobilenet/lraspp_mobilenet_v3_large_best_model.pt"  # .ckpt에서 .pt로 수정
   output_dir: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/results"
+  mode: 'gpu'
