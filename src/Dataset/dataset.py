@@ -137,7 +137,7 @@ class XRayDataset(Dataset):
         if self.mode == 'test':
             image_path = os.path.join(self.config.data.test_data_path, image_name)
             image = cv2.imread(image_path)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
+            # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
             image = image / 255.0
 
             if self.transforms is not None:
@@ -154,7 +154,7 @@ class XRayDataset(Dataset):
             image_path = os.path.join(self.config.data.train_data_path, image_name)
 
             image = cv2.imread(image_path)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
+            # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) 
             image = image / 255.0
 
             label_name = self.labelnames[idx]
@@ -198,7 +198,8 @@ class XRayDataset(Dataset):
             weight_maps = np.stack(weight_maps) 
             weight_maps = torch.from_numpy(weight_maps).float() 
 
-            return image, label, weight_maps
+            # return image, label, weight_maps
+            return image, label
 
 
 '''

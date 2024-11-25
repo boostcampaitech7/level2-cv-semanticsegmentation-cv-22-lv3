@@ -22,11 +22,12 @@ def validation(epoch, model, data_loader, criterion, config=None):
     masks_to_visualize = []
 
     with torch.no_grad():
-        for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):
+
+        # for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):        
+        for _, (images, masks) in tqdm(enumerate(data_loader), total=len(data_loader)):
             images = images.cuda(non_blocking=True)
             masks = masks.cuda(non_blocking=True)
-            weight_maps = weight_maps.cuda(non_blocking=True)
-
+            # weight_maps = weight_maps.cuda(non_blocking=True)
 
             outputs = get_model_output(model, images)
             
@@ -37,7 +38,8 @@ def validation(epoch, model, data_loader, criterion, config=None):
             if output_h != mask_h or output_w != mask_w:
                 outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.valid.interpolate.mode)
 
-            loss = criterion(outputs, masks, weight_maps)
+            # loss = criterion(outputs, masks, weight_maps)
+            loss = criterion(outputs, masks)
             total_loss += loss.item()
             cnt += 1
 
@@ -77,10 +79,10 @@ def validation(epoch, model, data_loader, criterion, config=None):
     if len(preds_to_visualize) > 0:
         figures = []
         for pred, mask in zip(preds_to_visualize, masks_to_visualize):
-            print(
-                f'shape of pred : {pred.shape}',
-                f'shape of mask : {mask.shape}'
-            )
+            # print(
+            #     f'shape of pred : {pred.shape}',
+            #     f'shape of mask : {mask.shape}'
+            # )
             fig = visualize_predictions(pred, mask)
             figures.append(wandb.Image(fig, caption=f"Epoch: {epoch}"))
         wandb.log({"validation_results": figures, "epoch": epoch})
