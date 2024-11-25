@@ -65,10 +65,6 @@ data :
 
 augmentation:
   train:
-    - Rotate:
-        limit: 10
-        p: 0.5
-
     - HorizontalFlip: {}
     - GridDistortion:
         p: 0.3
@@ -76,19 +72,7 @@ augmentation:
         distort_limit:
         - -0.3
         - 0.3
-
-    - CLAHE:
-        clip_limit: 4.0
-        tile_grid_size: [8, 8]  
-        p: 0.5 
-
-    # - CustomCrop:
-    #     x: 350
-    #     y: 500
-    #     width: 350
-    #     height: 425
-    #     p: 1.0  # 항상 적용
-
+        
     - Resize:
         height: 1024
         width: 1024
@@ -98,13 +82,6 @@ augmentation:
         std: [0.229, 0.224, 0.225]
   
   valid:
-    # - CustomCrop:
-    #     x: 350
-    #     y: 500
-    #     width: 350
-    #     height: 425
-    #     p: 1.0  # 항상 적용
-
     - Resize:
         height: 1024
         width: 1024
@@ -133,9 +110,11 @@ seed: 42
 
 
 loss_func: 
-  # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
+  weight_map : True
+  # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss,  
   # CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
   name: DiceLoss
+
 
 loss_func_defaults:
   BCEWithLogitsLoss: {}
@@ -234,7 +213,7 @@ scheduler_defaults:
 
 
 # 디버깅 모드
-debug: False
+debug: True
 
 
 # Inference 관련 설정

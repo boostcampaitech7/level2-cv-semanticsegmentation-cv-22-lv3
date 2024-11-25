@@ -18,16 +18,22 @@ def loss_func_loader(config):
     loss_func_params.update(user_params)
 
     if loss_func_name == "BCEWithLogitsLoss":
+        config.loss_func.weight_map = False
         return nn.BCEWithLogitsLoss()
     elif loss_func_name == "DiceLoss":
+        config.loss_func.weight_map = False
         return smp.losses.DiceLoss(**loss_func_params)
     elif loss_func_name == "JaccardLoss":
+        config.loss_func.weight_map = False
         return smp.losses.JaccardLoss(**loss_func_params)
     elif loss_func_name == "FocalLoss":
+        config.loss_func.weight_map = False
         return smp.losses.FocalLoss(**loss_func_params)
     elif loss_func_name == "CombinedWeightedLoss":
+        config.loss_func.weight_map = True
         return CombinedWeightedLoss(**loss_func_params)
     elif loss_func_name == "TwoWayLoss":
+        config.loss_func.weight_map = True
         return TwoWayLoss(**loss_func_params)
     elif loss_func_name == "BCEDiceLoss":
         return BCEDiceLoss(**loss_func_params)

@@ -24,10 +24,19 @@ def validation(epoch, model, data_loader, criterion, config=None):
     with torch.no_grad():
 
         # for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):        
-        for _, (images, masks) in tqdm(enumerate(data_loader), total=len(data_loader)):
-            images = images.cuda(non_blocking=True)
-            masks = masks.cuda(non_blocking=True)
-            # weight_maps = weight_maps.cuda(non_blocking=True)
+        for _, loadered_data in tqdm(enumerate(data_loader), total=len(data_loader)):
+
+            if len(loadered_data) == 3 :
+                images, masks, weight_maps = loadered_data
+                images = images.cuda(non_blocking=True)
+                masks = masks.cuda(non_blocking=True)
+                weight_maps = weight_maps.cuda(non_blocking=True)
+            
+            else :
+                images, masks = loadered_data
+                images = images.cuda(non_blocking=True)
+                masks = masks.cuda(non_blocking=True)
+
 
             outputs = get_model_output(model, images)
             
@@ -38,8 +47,12 @@ def validation(epoch, model, data_loader, criterion, config=None):
             if output_h != mask_h or output_w != mask_w:
                 outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.valid.interpolate.mode)
 
-            # loss = criterion(outputs, masks, weight_maps)
-            loss = criterion(outputs, masks)
+
+            if config.loss_func.weight_map == True :
+                loss = criterion(outputs, masks, weight_maps)
+            else:
+                loss = criterion(outputs, masks)
+
             total_loss += loss.item()
             cnt += 1
 
