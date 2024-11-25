@@ -23,7 +23,6 @@ def validation(epoch, model, data_loader, criterion, config=None):
 
     with torch.no_grad():
 
-        # for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):        
         for _, loadered_data in tqdm(enumerate(data_loader), total=len(data_loader)):
 
             if len(loadered_data) == 3 :
@@ -45,7 +44,7 @@ def validation(epoch, model, data_loader, criterion, config=None):
             mask_h, mask_w = masks.size(-2), masks.size(-1)
 
             if output_h != mask_h or output_w != mask_w:
-                outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.valid.interpolate.mode)
+                outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.interpolate.bilinear)
 
 
             if config.loss_func.weight_map == True :
@@ -92,10 +91,6 @@ def validation(epoch, model, data_loader, criterion, config=None):
     if len(preds_to_visualize) > 0:
         figures = []
         for pred, mask in zip(preds_to_visualize, masks_to_visualize):
-            # print(
-            #     f'shape of pred : {pred.shape}',
-            #     f'shape of mask : {mask.shape}'
-            # )
             fig = visualize_predictions(pred, mask)
             figures.append(wandb.Image(fig, caption=f"Epoch: {epoch}"))
         wandb.log({"validation_results": figures, "epoch": epoch})

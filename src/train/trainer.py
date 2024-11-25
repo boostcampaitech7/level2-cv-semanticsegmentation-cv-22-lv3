@@ -5,7 +5,7 @@ import pytz
 import torch
 import wandb
 from utils.set_seed import set_seed
-from validation.validation import validation
+from src.train.validation import validation
 from model.utils.model_output import get_model_output
 
 
@@ -70,7 +70,6 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             epoch_loss = 0.0
 
             for step, loadered_data in enumerate(stage_trainloader):            
-            # for step, (images, masks) in enumerate(stage_trainloader):
             
                 if len(loadered_data) == 3 :
                     images = loadered_data[0]

@@ -14,13 +14,6 @@ import segmentation_models_pytorch as smp
 
 class WeightedFocalLoss(nn.Module):
     def __init__(self, alpha=None, gamma=2.0, smooth=1e-6, reduction='mean'):
-        """
-        Args:
-            alpha (float or list, optional): Weighting factor for the classes. If a list, it should have length equal to number of classes.
-            gamma (float): Focusing parameter for modulating factor (1-p).
-            smooth (float): Smoothing factor to avoid division by zero.
-            reduction (str): Specifies the reduction to apply to the output: 'none' | 'mean' | 'sum'.
-        """
         super(WeightedFocalLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -37,64 +30,47 @@ class WeightedFocalLoss(nn.Module):
             raise TypeError("alpha must be float, list, tuple, or None")
 
     def forward(self, logits, targets, weight_maps):
-        """
-        Args:
-            logits (torch.Tensor): Model outputs (N, C, H, W).
-            targets (torch.Tensor): Ground truth masks (N, C, H, W).
-            weight_maps (torch.Tensor): Weight maps (N, C, H, W).
-        Returns:
-            torch.Tensor: Computed Focal Loss.
-        """
         device = logits.device
         if isinstance(self.alpha, torch.Tensor):
-            self.alpha = self.alpha.to(device).view(1, -1, 1, 1)  # Shape: (1, C, 1, 1)
+            self.alpha = self.alpha.to(device).view(1, -1, 1, 1)  
 
-        # Compute BCE with logits
-        BCE_loss = F.binary_cross_entropy_with_logits(logits, targets, reduction='none')  # (N, C, H, W)
 
-        # Compute probabilities
-        probs = torch.sigmoid(logits)  # (N, C, H, W)
+        BCE_loss = F.binary_cross_entropy_with_logits(logits, targets, reduction='none')  
 
-        # Compute the focal factor
-        focal_factor = (1 - probs) ** self.gamma  # (N, C, H, W)
 
-        # Apply alpha weighting
+        probs = torch.sigmoid(logits) 
+
+
+        focal_factor = (1 - probs) ** self.gamma 
+
+
         if self.alpha is not None:
-            BCE_loss = self.alpha * BCE_loss  # Broadcasting over N, H, W
+            BCE_loss = self.alpha * BCE_loss 
 
-        # Compute the focal loss
-        focal_loss = focal_factor * BCE_loss  # (N, C, H, W)
+        focal_loss = focal_factor * BCE_loss 
 
-        # Apply weight maps
+
         if weight_maps is not None:
-            focal_loss = focal_loss * weight_maps  # (N, C, H, W)
+            focal_loss = focal_loss * weight_maps 
 
-        # Reduce the loss
+
         if self.reduction == 'mean':
             return focal_loss.mean()
         elif self.reduction == 'sum':
             return focal_loss.sum()
         else:
-            return focal_loss  # 'none'
+            return focal_loss  
         
 
 class WeightedBCEWithLogitsLoss(nn.Module):
     def __init__(self, smooth=1e-6):
-        '''
-            Args:
-                smooth (float): 안정성을 위한 작은 값
-        '''
+
         super(WeightedBCEWithLogitsLoss, self).__init__()
         self.smooth = smooth
         self.bce = nn.BCEWithLogitsLoss(reduction='none')  # 개별 손실 계산을 위해 reduction='none' 사용
 
     def forward(self, logits, targets, weight_maps):
-        '''
-            Args:
-                logits (torch.Tensor): 모델의 출력 로짓 (N, C, H, W)
-                targets (torch.Tensor): 실제 마스크 (N, C, H, W)
-                weight_maps (torch.Tensor): 가중치 맵 (N, C, H, W)
-        '''
+
         loss = self.bce(logits, targets)
         
         weighted_loss = loss * weight_maps
@@ -104,20 +80,11 @@ class WeightedBCEWithLogitsLoss(nn.Module):
 
 class WeightedDiceLoss(nn.Module):
     def __init__(self, smooth=1e-6):
-        '''
-            Args:
-                smooth (float): 분모가 0이 되는 것을 방지하기 위한 평활화 계수
-        '''
+
         super(WeightedDiceLoss, self).__init__()
         self.smooth = smooth
 
     def forward(self, logits, targets, weight_maps):
-        '''
-            Args:
-                logits (torch.Tensor): 모델의 출력 로짓 (N, C, H, W)
-                targets (torch.Tensor): 실제 마스크 (N, C, H, W)
-                weight_maps (torch.Tensor): 가중치 맵 (N, C, H, W)
-        '''
         probs = torch.sigmoid(logits)
 
         intersection = (probs * targets * weight_maps).sum(dim=(2,3))
@@ -156,14 +123,6 @@ class CombinedWeightedLoss(nn.Module):
         self.focal = WeightedFocalLoss(alpha=alpha, gamma=gamma, smooth=smooth, reduction='mean')
 
     def forward(self, logits, targets, weight_maps):
-        """
-        Args:
-            logits (torch.Tensor): Model outputs (N, C, H, W).
-            targets (torch.Tensor): Ground truth masks (N, C, H, W).
-            weight_maps (torch.Tensor): Weight maps (N, C, H, W).
-        Returns:
-            torch.Tensor: Combined loss.
-        """
         dice_loss = self.dice(logits, targets, weight_maps)
         bce_loss = self.bce(logits, targets, weight_maps)
         focal_loss = self.focal(logits, targets, weight_maps)
@@ -186,7 +145,6 @@ class TwoWayLoss(nn.Module):
         class_mask = (y > 0).any(dim=0)
         sample_mask = (y > 0).any(dim=1)
 
-        # Calculate hard positive/negative logits
         pmask = y.masked_fill(y <= 0, nINF).masked_fill(y > 0, float(0.0))
         plogit_class = torch.logsumexp(-x/self.Tp + pmask, dim=0).mul(self.Tp)[class_mask]
         plogit_sample = torch.logsumexp(-x/self.Tp + pmask, dim=1).mul(self.Tp)[sample_mask]
@@ -201,34 +159,18 @@ class TwoWayLoss(nn.Module):
 
 class BCEDiceLoss(nn.Module):
     def __init__(self, dice_mode="multilabel"):
-        """
-        BCE + Dice Loss 구현 (SMP의 DiceLoss 사용)
-        
-        Args:
-        - dice_mode: DiceLoss 모드 (binary/multiclass/multilabel)
-        """
+
         super(BCEDiceLoss, self).__init__()
-        self.bce = nn.BCEWithLogitsLoss()  # BCE Loss with Logits
-        self.dice = smp.losses.DiceLoss(mode=dice_mode)  # SMP Dice Loss
+        self.bce = nn.BCEWithLogitsLoss()  
+        self.dice = smp.losses.DiceLoss(mode=dice_mode) 
 
     def forward(self, logits, targets):
-        """
-        Forward pass to calculate BCE + Dice Loss
-        
-        Args:
-        - logits: 모델의 출력 (logits, [batch_size, channels, height, width])
-        - targets: 타겟 라벨 (binary mask, [batch_size, channels, height, width])
-        
-        Returns:
-        - total_loss: BCE Loss와 Dice Loss의 합
-        """
-        # Calculate BCE Loss
+
         bce_loss = self.bce(logits, targets)
-        
-        # Calculate Dice Loss
+
         dice_loss = self.dice(logits, targets)
         
-        # Combine BCE and Dice Loss
+
         total_loss = bce_loss + dice_loss
         return total_loss
     

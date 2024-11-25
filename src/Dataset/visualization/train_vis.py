@@ -87,7 +87,6 @@ def save_image_for_visualization(config, masks, preds_to_visualize, outputs, mas
         masks_one_hot = masks.numpy()  
 
     if len(preds_to_visualize) < 5:
-        # 예측 결과와 마스크를 함께 추가하여 쌍을 맞춥니다.
         batch_size = outputs.shape[0]
         num_needed = 5 - len(preds_to_visualize)
         num_to_take = min(num_needed, batch_size)

@@ -1,17 +1,16 @@
-import os
 from sklearn.model_selection import GroupKFold, KFold
-import numpy as np
+
 
 def split_data(_imagenames: list, _labelnames: list, groups: list, config: dict, mode: str = 'train', split_method: str = 'GroupKFold') -> tuple[list, list]:
     if split_method == 'GroupKFold':
-        n_splits = config.data.get('n_splits', 5)
+        n_splits = config.data.get('n_splits', config.data.splits)
         fold = config.data.get('fold', 0)
         splitter = GroupKFold(n_splits=n_splits)
         splits = list(splitter.split(_imagenames, groups=groups))
 
 
     elif split_method == 'KFold':
-        n_splits = config.data.get('n_splits', 5)
+        n_splits = config.data.get('n_splits', config.data.splits)
         shuffle = config.data.get('shuffle', True)
         random_state = config.data.get('random_state', 42)
         splitter = KFold(n_splits=n_splits, shuffle=shuffle, random_state=random_state)

@@ -10,10 +10,9 @@ def loss_func_loader(config):
 
     if loss_func_name not in defaults_loss:
         raise ValueError(f"Unsupported loss_func: {loss_func_name}")
-    
-    # 기본 파라미터 불러오기
+
     loss_func_params = defaults_loss[loss_func_name]
-    # 사용자 지정 파라미터로 재설정
+
     user_params = config.loss_func.get('params', {})
     loss_func_params.update(user_params)
 
@@ -48,9 +47,8 @@ def optimizer_loader(config, model_parameters):
     if optimizer_name not in defaults_optimizer:
         raise ValueError(f"Unsupported optimizer: {optimizer_name}")
     
-    # 기본 파라미터 불러오기
+
     optimizer_params = defaults_optimizer[optimizer_name]
-    # 사용자 지정 파라미터로 재설정
     user_params = config.optimizer.get('params', {})
     optimizer_params.update(user_params)
     
@@ -77,9 +75,9 @@ def lr_scheduler_loader(config, optimizer):
     if scheduler_name not in defaults_scheduler:
         raise ValueError(f"Unsupported scheduler: {scheduler_name}")
     
-    # 기본 파라미터 불러오기
+
     scheduler_params = defaults_scheduler[scheduler_name]
-    # 사용자 지정 파라미터로 재설정
+
     user_params = config.scheduler.get('params', {})
     scheduler_params.update(user_params)
 

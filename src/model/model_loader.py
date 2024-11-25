@@ -57,9 +57,10 @@ def model_loader(config):
 
         print(f"Loaded torchvision model: {base_model} with {num_classes} classes.")
 
+
     elif library_name == 'smp':
-        model = target_model(**architecture_params)
-        print(f"Loaded SMP model: {base_model} with {num_classes} classes.")
+            model = target_model(**architecture_params)
+            print(f"Loaded SMP model: {base_model} with {num_classes} classes.")
 
     else:
         raise ValueError(f"Unknown library: {library_name}")
