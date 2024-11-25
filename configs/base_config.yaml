@@ -133,7 +133,8 @@ seed: 42
 
 
 loss_func: 
-  # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, CombinedWeightedLoss
+  # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
+  # CombinedWeightedLoss, TwoWayLoss
   name: DiceLoss
 
 loss_func_defaults:
@@ -149,6 +150,11 @@ loss_func_defaults:
   CombinedWeightedLoss:
     weight_inside: 1.0
     weight_boundary: 2.0
+  TwoWayLoss:
+    Tp: 4.0
+    Tn: 1.0
+  BCEDiceLoss:
+    mode: multilabel
 
 
 optimizer: 
@@ -228,7 +234,7 @@ scheduler_defaults:
 
 
 # 디버깅 모드
-debug: True
+debug: False
 
 
 # Inference 관련 설정

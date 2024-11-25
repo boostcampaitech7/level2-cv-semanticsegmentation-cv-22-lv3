@@ -173,3 +173,59 @@ class CombinedWeightedLoss(nn.Module):
         return total_loss
     
 
+nINF = -100
+
+class TwoWayLoss(nn.Module):
+    def __init__(self, Tp=4., Tn=1.):
+        super(TwoWayLoss, self).__init__()
+        self.Tp = Tp
+        self.Tn = Tn
+
+    def forward(self, x, y):
+        class_mask = (y > 0).any(dim=0)
+        sample_mask = (y > 0).any(dim=1)
+
+        # Calculate hard positive/negative logits
+        pmask = y.masked_fill(y <= 0, nINF).masked_fill(y > 0, float(0.0))
+        plogit_class = torch.logsumexp(-x/self.Tp + pmask, dim=0).mul(self.Tp)[class_mask]
+        plogit_sample = torch.logsumexp(-x/self.Tp + pmask, dim=1).mul(self.Tp)[sample_mask]
+    
+        nmask = y.masked_fill(y != 0, nINF).masked_fill(y == 0, float(0.0))
+        nlogit_class = torch.logsumexp(x/self.Tn + nmask, dim=0).mul(self.Tn)[class_mask]
+        nlogit_sample = torch.logsumexp(x/self.Tn + nmask, dim=1).mul(self.Tn)[sample_mask]
+
+        return F.softplus(nlogit_class + plogit_class).mean() + \
+                F.softplus(nlogit_sample + plogit_sample).mean()
+
+
+class BCEDiceLoss(nn.Module):
+    def __init__(self, smooth=1):
+        super(BCEDiceLoss, self).__init__()
+        self.bce = nn.BCEWithLogitsLoss()  # BCE Loss with Logits
+        self.smooth = smooth  # Smoothing factor for Dice Loss
+
+    def dice_loss(self, logits, targets):
+        # Apply sigmoid to logits to get probabilities
+        probs = torch.sigmoid(logits)
+        
+        # Flatten tensors for Dice calculation
+        probs = probs.view(-1)
+        targets = targets.view(-1)
+        
+        # Calculate intersection and union
+        intersection = (probs * targets).sum()
+        dice = (2. * intersection + self.smooth) / (probs.sum() + targets.sum() + self.smooth)
+        
+        # Dice Loss
+        return 1 - dice
+
+    def forward(self, logits, targets):
+        # Calculate BCE Loss
+        bce_loss = self.bce(logits, targets)
+        
+        # Calculate Dice Loss
+        dice_loss = self.dice_loss(logits, targets)
+        
+        # Combine BCE and Dice Loss
+        total_loss = bce_loss + dice_loss
+        return total_loss
