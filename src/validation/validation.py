@@ -27,11 +27,13 @@ def validation(epoch, model, data_loader, criterion, config=None):
         for _, loadered_data in tqdm(enumerate(data_loader), total=len(data_loader)):
 
             if len(loadered_data) == 3 :
+                images, masks, weight_maps = loadered_data
                 images = images.cuda(non_blocking=True)
                 masks = masks.cuda(non_blocking=True)
                 weight_maps = weight_maps.cuda(non_blocking=True)
             
             else :
+                images, masks = loadered_data
                 images = images.cuda(non_blocking=True)
                 masks = masks.cuda(non_blocking=True)
 
@@ -50,7 +52,7 @@ def validation(epoch, model, data_loader, criterion, config=None):
                 loss = criterion(outputs, masks, weight_maps)
             else:
                 loss = criterion(outputs, masks)
-                
+
             total_loss += loss.item()
             cnt += 1
 
