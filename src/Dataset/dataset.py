@@ -198,8 +198,10 @@ class XRayDataset(Dataset):
             weight_maps = np.stack(weight_maps) 
             weight_maps = torch.from_numpy(weight_maps).float() 
 
-            # return image, label, weight_maps
-            return image, label
+            if self.config.loss_func.weight_map == True :
+                return image, label, weight_maps
+            else:
+                return image, label
 
 
 '''

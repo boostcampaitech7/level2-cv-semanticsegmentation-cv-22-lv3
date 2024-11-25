@@ -69,17 +69,35 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             model.train()
             epoch_loss = 0.0
 
-            # for step, (images, masks, weight_maps) in enumerate(stage_trainloader):            
-            for step, (images, masks) in enumerate(stage_trainloader):
+            for step, loadered_data in enumerate(stage_trainloader):            
+            # for step, (images, masks) in enumerate(stage_trainloader):
+            
+                if len(loadered_data) == 3 :
+                    images = loadered_data[0]
+                    masks = loadered_data[1]
+                    weight_maps = loadered_data[2]
+                
+                else :
+                    images = loadered_data[0]
+                    masks = loadered_data[1]
+
+
+
                 images = images.cuda(non_blocking=True)
                 masks = masks.cuda(non_blocking=True)
-            #     weight_maps = weight_maps.cuda(non_blocking=True)
+
+
+                if config.loss_func.weight_map == True :
+                    weight_maps = weight_maps.cuda(non_blocking=True)
 
                 optimizer.zero_grad()
                 outputs = get_model_output(model, images)
 
-                # loss = criterion(outputs, masks, weight_maps)
-                loss = criterion(outputs, masks)
+
+                if config.loss_func.weight_map == True :
+                    loss = criterion(outputs, masks, weight_maps)
+                else :
+                    loss = criterion(outputs, masks)
                 loss.backward()
                 optimizer.step()
 
