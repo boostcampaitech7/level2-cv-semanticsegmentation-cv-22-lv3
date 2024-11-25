@@ -1,5 +1,3 @@
-def get_model_output(model, library, input):
-    if library == 'smp':
-        return model(input)
-    else:
-        return model(input)['out']
+def get_model_output(model, input):
+    outputs = model(input)['out'] if isinstance(model(input), dict) else model(input)
+    return outputs

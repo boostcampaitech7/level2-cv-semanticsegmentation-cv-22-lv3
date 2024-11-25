@@ -1,11 +1,5 @@
-# visualization.py
-
-import matplotlib.pyplot as plt
-import io
-import PIL
-import wandb
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 PALETTE = [
     (220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230), (106, 0, 228),
@@ -16,81 +10,88 @@ PALETTE = [
     (0, 125, 92), (209, 0, 151), (188, 208, 182), (0, 220, 176),
 ]
 
+def label2rgb_multi(label):
 
-def label2rgb(label, palette=PALETTE):
-    if label.ndim == 3:
-        batch_size, h, w = label.shape
-        rgb = np.zeros((batch_size, h, w, 3), dtype=np.uint8)
-        for i in range(batch_size):
-            for j, color in enumerate(palette):
-                rgb[i][label[i] == j] = color
+    image_size = label.shape[1:] + (3, ) 
+    image = np.zeros(image_size, dtype=np.float32)
 
+    for i in range(label.shape[0]):
+        class_mask = label[i] 
+        color = np.array(PALETTE[i]) / 255.0 
+        color_mask = np.stack([class_mask]*3, axis=-1) * color 
+        image += color_mask  
 
-    elif label.ndim == 2:
-        h, w = label.shape
-        rgb = np.zeros((h, w, 3), dtype=np.uint8)
-        for j, color in enumerate(palette):
-            rgb[label == j] = color
+    image = np.clip(image, 0, 1)
+    return image
 
 
+def visualize_predictions(pred, mask, image=None):
+
+    pred_rgb = label2rgb_multi(pred)
+    mask_rgb = label2rgb_multi(mask)
+    
+
+    fp = (pred == 1) & (mask == 0)  
+    fn = (pred == 0) & (mask == 1)  
+
+    fp_rgb = label2rgb_multi(fp.astype(np.uint8))
+    fn_rgb = label2rgb_multi(fn.astype(np.uint8))
+    
+
+    if image is not None:
+        image = image / 255.0 if image.max() > 1 else image
+        overlay = image.copy()
     else:
-        raise ValueError("Label array must be 2D or 3D (with batch dimension).")
+        overlay = np.zeros_like(pred_rgb)
+    
+    fp_mask = fp.any(axis=0)
+    fn_mask = fn.any(axis=0)
     
 
-    return rgb
-
-
-def visualize_predictions(images, preds, masks, max_visualize=5):
-    '''
-        예측 결과와 실제 마스크를 시각화하여 wandb에 업로드할 이미지를 생성합니다.
-        
-        Args:
-            images (list of torch.Tensor): 시각화할 원본 이미지 리스트. 각 이미지의 형태는 (C, H, W)
-            preds (list of torch.Tensor): 예측 마스크 리스트. 각 마스크의 형태는 (H, W)
-            masks (list of torch.Tensor): 실제 마스크 리스트. 각 마스크의 형태는 (H, W)
-            max_visualize (int): 시각화할 이미지의 최대 개수.
-            
-        Returns:
-            list of wandb.Image: wandb에 업로드할 이미지 리스트.
-    '''
-    figures = []
-    num_visualize = min(max_visualize, len(images))
+    overlay[fp_mask] = [1, 0, 0]  
+    overlay[fn_mask] = [0, 0, 1]  
     
-    for i in range(num_visualize):
-        img = images[i].numpy().transpose(1, 2, 0)  
-        
-        
-        if img.max() <= 1.0:
-            img = (img * 255).astype(np.uint8)
-        else:
-            img = img.astype(np.uint8)
-        
-        pred_mask = preds[i].numpy()  
-        gt_mask = masks[i].numpy()   
-        
-        
-        pred_rgb = label2rgb(pred_mask)
-        gt_rgb = label2rgb(gt_mask)
+    fig, axes = plt.subplots(1, 5, figsize=(30, 12))
 
-        fig, axes = plt.subplots(1, 2, figsize=(24, 12))
-        
+    axes[0].imshow(pred_rgb)
+    axes[0].set_title('Prediction')
+    axes[0].axis('off')
 
-        axes[0].imshow(pred_rgb)
-        axes[0].set_title('Predicted Mask')
-        axes[0].axis('off')
+    axes[1].imshow(mask_rgb)
+    axes[1].set_title('Ground Truth Mask')
+    axes[1].axis('off')
 
+    axes[2].imshow(fp_rgb)
+    axes[2].set_title('False Positives (Pred - GT)')
+    axes[2].axis('off')
 
-        axes[1].imshow(gt_rgb)
-        axes[1].set_title('Ground Truth Mask')
-        axes[1].axis('off')
+    axes[3].imshow(fn_rgb)
+    axes[3].set_title('False Negatives (GT - Pred)')
+    axes[3].axis('off')
+
+    axes[4].imshow(overlay)
+    axes[4].set_title('Overlay of FP and FN')
+    axes[4].axis('off')
+
+    plt.tight_layout()
+    return fig
 
 
-        buf = io.BytesIO()
-        plt.savefig(buf, format='png')
-        buf.seek(0)
-        wandb_image = wandb.Image(PIL.Image.open(buf))
-        figures.append(wandb_image)
-        plt.close(fig)
+def save_image_for_visualization(config, masks, preds_to_visualize, outputs, masks_to_visualize):
+
+    if masks.ndim == 3:
+        num_classes = len(config.data.classes)
+        masks_one_hot = np.eye(num_classes)[masks.numpy()]  
+        masks_one_hot = masks_one_hot.transpose(0, 3, 1, 2)  
+    else:
+        masks_one_hot = masks.numpy()  
+
+    if len(preds_to_visualize) < 5:
+        batch_size = outputs.shape[0]
+        num_needed = 5 - len(preds_to_visualize)
+        num_to_take = min(num_needed, batch_size)
+        for i in range(num_to_take):
+            preds_to_visualize.append(outputs[i].numpy())
+            masks_to_visualize.append(masks_one_hot[i])
     
-
-    return figures
+    return preds_to_visualize, masks_to_visualize
