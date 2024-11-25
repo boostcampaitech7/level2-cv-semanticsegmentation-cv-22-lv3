@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import segmentation_models_pytorch as smp
 
 
 ''' hybrid loss를 설정하기 위해서 총 3개의 loss를 직접 구현
@@ -199,33 +200,35 @@ class TwoWayLoss(nn.Module):
 
 
 class BCEDiceLoss(nn.Module):
-    def __init__(self, smooth=1):
+    def __init__(self, dice_mode="multilabel"):
+        """
+        BCE + Dice Loss 구현 (SMP의 DiceLoss 사용)
+        
+        Args:
+        - dice_mode: DiceLoss 모드 (binary/multiclass/multilabel)
+        """
         super(BCEDiceLoss, self).__init__()
         self.bce = nn.BCEWithLogitsLoss()  # BCE Loss with Logits
-        self.smooth = smooth  # Smoothing factor for Dice Loss
-
-    def dice_loss(self, logits, targets):
-        # Apply sigmoid to logits to get probabilities
-        probs = torch.sigmoid(logits)
-        
-        # Flatten tensors for Dice calculation
-        probs = probs.view(-1)
-        targets = targets.view(-1)
-        
-        # Calculate intersection and union
-        intersection = (probs * targets).sum()
-        dice = (2. * intersection + self.smooth) / (probs.sum() + targets.sum() + self.smooth)
-        
-        # Dice Loss
-        return 1 - dice
+        self.dice = smp.losses.DiceLoss(mode=dice_mode)  # SMP Dice Loss
 
     def forward(self, logits, targets):
+        """
+        Forward pass to calculate BCE + Dice Loss
+        
+        Args:
+        - logits: 모델의 출력 (logits, [batch_size, channels, height, width])
+        - targets: 타겟 라벨 (binary mask, [batch_size, channels, height, width])
+        
+        Returns:
+        - total_loss: BCE Loss와 Dice Loss의 합
+        """
         # Calculate BCE Loss
         bce_loss = self.bce(logits, targets)
         
         # Calculate Dice Loss
-        dice_loss = self.dice_loss(logits, targets)
+        dice_loss = self.dice(logits, targets)
         
         # Combine BCE and Dice Loss
         total_loss = bce_loss + dice_loss
         return total_loss
+    
