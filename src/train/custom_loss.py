@@ -1,3 +1,8 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
 ''' hybrid loss를 설정하기 위해서 총 3개의 loss를 직접 구현
     - WeightedFocalLoss
     - WeightedBCEWithLogitsLoss
@@ -5,10 +10,6 @@
 
     위의 3가지 loss를 모두 고려해서 하나의 loss값을 전달한다
 '''
-
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 
 class WeightedFocalLoss(nn.Module):
     def __init__(self, alpha=None, gamma=2.0, smooth=1e-6, reduction='mean'):
@@ -127,6 +128,16 @@ class WeightedDiceLoss(nn.Module):
         return loss.mean()
 
 
+''' 
+위에서 정의한 3가지 loss를 이용하여 hybrid loss 정의
+
+다른 loss들과 다르게 forward 과정에서 weight_maps를 필요로 하기에
+trainer.py과 validation.py에서 loss를 계산할 때 따로 처리가 필요해보인다.
+
+그 계산 과정은 아래의 코드에서 진행된다. 
+loss = criterion(outputs, masks, weight_maps)
+'''
+
 class CombinedWeightedLoss(nn.Module):
     def __init__(self, dice_weight=1.0, bce_weight=1.0, focal_weight=1.0, 
                  alpha=None, gamma=2.0, weight_inside=1.0, weight_boundary=2.0, smooth=1e-6):
@@ -160,3 +171,5 @@ class CombinedWeightedLoss(nn.Module):
                      (self.bce_weight * bce_loss) + \
                      (self.focal_weight * focal_loss)
         return total_loss
+    
+

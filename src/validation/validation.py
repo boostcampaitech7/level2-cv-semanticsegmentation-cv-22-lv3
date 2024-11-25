@@ -79,10 +79,10 @@ def validation(epoch, model, data_loader, criterion, config=None):
     if len(preds_to_visualize) > 0:
         figures = []
         for pred, mask in zip(preds_to_visualize, masks_to_visualize):
-            print(
-                f'shape of pred : {pred.shape}',
-                f'shape of mask : {mask.shape}'
-            )
+            # print(
+            #     f'shape of pred : {pred.shape}',
+            #     f'shape of mask : {mask.shape}'
+            # )
             fig = visualize_predictions(pred, mask)
             figures.append(wandb.Image(fig, caption=f"Epoch: {epoch}"))
         wandb.log({"validation_results": figures, "epoch": epoch})

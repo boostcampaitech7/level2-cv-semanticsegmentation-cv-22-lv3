@@ -17,11 +17,7 @@ def do_train(cfg, project_name, run_name):
 
 
     model = model_loader(cfg)
-    # criterion = loss_func_loader(cfg)
-    '''
-        실험을 위해서 config를 설정하지 않고 단순히 CombineWeightedLoss를 설정해서 사용
-    '''
-    criterion = CombinedWeightedLoss(weight_inside=1.0, weight_boundary=2.0)
+    criterion = loss_func_loader(cfg)
     optimizer = optimizer_loader(cfg, model.parameters())
 
 

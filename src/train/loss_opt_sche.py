@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.optim as optim
 import segmentation_models_pytorch as smp
-from custom_loss import CombinedWeightedLoss
+from .custom_loss import CombinedWeightedLoss
 
 
 def loss_func_loader(config):
