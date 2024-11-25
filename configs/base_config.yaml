@@ -23,7 +23,7 @@ data :
 
 
   train : 
-    batch_size : 4
+    batch_size : 2
     shuffle : True
     num_workers : 8
     pin_memory : True
@@ -37,7 +37,7 @@ data :
     
 
   valid : 
-    batch_size : 4
+    batch_size : 2
     shuffle : False
     num_workers : 8
     pin_memory : True
@@ -65,9 +65,9 @@ data :
 
 augmentation:
   train:
-    # - Rotate:
-    #     limit: 10
-    #     p: 0.5
+    - Rotate:
+        limit: 10
+        p: 0.5
 
     - HorizontalFlip: {}
     - GridDistortion:
@@ -77,10 +77,10 @@ augmentation:
         - -0.3
         - 0.3
 
-    # - CLAHE:
-    #     clip_limit: 4.0
-    #     tile_grid_size: [8, 8]  
-    #     p: 0.5 
+    - CLAHE:
+        clip_limit: 4.0
+        tile_grid_size: [8, 8]  
+        p: 0.5 
 
     # - CustomCrop:
     #     x: 350
@@ -134,8 +134,8 @@ seed: 42
 
 loss_func: 
   # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
-  # CombinedWeightedLoss, TwoWayLoss
-  name: DiceLoss
+  # CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
+  name: BCEDiceLoss
 
 loss_func_defaults:
   BCEWithLogitsLoss: {}
@@ -154,7 +154,7 @@ loss_func_defaults:
     Tp: 4.0
     Tn: 1.0
   BCEDiceLoss:
-    mode: multilabel
+    dice_mode: multilabel
 
 
 optimizer: 

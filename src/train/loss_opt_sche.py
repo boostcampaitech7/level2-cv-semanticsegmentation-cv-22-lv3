@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.optim as optim
 import segmentation_models_pytorch as smp
-from .custom_loss import CombinedWeightedLoss, TwoWayLoss
+from .custom_loss import CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
 
 
 def loss_func_loader(config):
@@ -29,6 +29,8 @@ def loss_func_loader(config):
         return CombinedWeightedLoss(**loss_func_params)
     elif loss_func_name == "TwoWayLoss":
         return TwoWayLoss(**loss_func_params)
+    elif loss_func_name == "BCEDiceLoss":
+        return BCEDiceLoss(**loss_func_params)
     else:
         raise ValueError(f"Unsupported loss_func: {loss_func_name}")
 
