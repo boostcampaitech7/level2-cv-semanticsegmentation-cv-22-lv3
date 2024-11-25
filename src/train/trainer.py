@@ -69,13 +69,11 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             model.train()
             epoch_loss = 0.0
 
-            # for step, (images, masks, weight_maps) in enumerate(stage_trainloader):
-            #     images = images.cuda(non_blocking=True)
-            #     masks = masks.cuda(non_blocking=True)
-            #     weight_maps = weight_maps.cuda(non_blocking=True)
-            
+            # for step, (images, masks, weight_maps) in enumerate(stage_trainloader):            
             for step, (images, masks) in enumerate(stage_trainloader):
-                images, masks = images.cuda(), masks.cuda()
+                images = images.cuda(non_blocking=True)
+                masks = masks.cuda(non_blocking=True)
+            #     weight_maps = weight_maps.cuda(non_blocking=True)
 
                 optimizer.zero_grad()
                 outputs = get_model_output(model, images)
