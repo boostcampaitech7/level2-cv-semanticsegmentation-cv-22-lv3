@@ -22,11 +22,12 @@ def validation(epoch, model, data_loader, criterion, config=None):
     masks_to_visualize = []
 
     with torch.no_grad():
-        for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):
-            images = images.cuda(non_blocking=True)
-            masks = masks.cuda(non_blocking=True)
-            weight_maps = weight_maps.cuda(non_blocking=True)
-
+        # for _, (images, masks, weight_maps) in tqdm(enumerate(data_loader), total=len(data_loader)):
+        #     images = images.cuda(non_blocking=True)
+        #     masks = masks.cuda(non_blocking=True)
+        #     weight_maps = weight_maps.cuda(non_blocking=True)
+        for _, (images, masks) in tqdm(enumerate(data_loader), total=len(data_loader)):
+            images, masks = images.cuda(), masks.cuda()
 
             outputs = get_model_output(model, images)
             
@@ -37,8 +38,10 @@ def validation(epoch, model, data_loader, criterion, config=None):
             if output_h != mask_h or output_w != mask_w:
                 outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.valid.interpolate.mode)
 
-            loss = criterion(outputs, masks, weight_maps)
-            total_loss += loss.item()
+            # loss = criterion(outputs, masks, weight_maps)
+            # total_loss += loss.item()
+            loss = criterion(outputs, masks)
+            total_loss += loss
             cnt += 1
 
             outputs = torch.sigmoid(outputs)

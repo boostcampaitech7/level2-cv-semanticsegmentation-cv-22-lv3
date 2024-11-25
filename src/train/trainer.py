@@ -69,15 +69,19 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             model.train()
             epoch_loss = 0.0
 
-            for step, (images, masks, weight_maps) in enumerate(stage_trainloader):            
-                images = images.cuda(non_blocking=True)
-                masks = masks.cuda(non_blocking=True)
-                weight_maps = weight_maps.cuda(non_blocking=True)
+            # for step, (images, masks, weight_maps) in enumerate(stage_trainloader):
+            #     images = images.cuda(non_blocking=True)
+            #     masks = masks.cuda(non_blocking=True)
+            #     weight_maps = weight_maps.cuda(non_blocking=True)
+            
+            for step, (images, masks) in enumerate(stage_trainloader):
+                images, masks = images.cuda(), masks.cuda()
 
                 optimizer.zero_grad()
                 outputs = get_model_output(model, images)
 
-                loss = criterion(outputs, masks, weight_maps)
+                # loss = criterion(outputs, masks, weight_maps)
+                loss = criterion(outputs, masks)
                 loss.backward()
                 optimizer.step()
 
@@ -98,7 +102,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             if (epoch + 1) % config.data.valid.interval == 0:
                 dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)  
 
-                save_model(model, file_name=f'epoch_{epoch+1}_model', config=config)  
+                save_model(model, file_name=f'epoch_{epoch+1}_model', config=config)
                 print(f"Save epoch {epoch+1} model in {config.save.save_ckpt}")
 
                 if best_dice + delta <= dice:
