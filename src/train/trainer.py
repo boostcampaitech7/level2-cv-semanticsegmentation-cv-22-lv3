@@ -1,11 +1,10 @@
 import os
-import datetime
-import pytz
 import pytz
 import torch
 import wandb
+import datetime
 from utils.set_seed import set_seed
-from src.train.validation import validation
+from train.validation import validation
 from model.utils.model_output import get_model_output
 
 

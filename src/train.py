@@ -3,7 +3,7 @@ import argparse
 from train.trainer import train
 from omegaconf import OmegaConf
 from utils.set_seed import set_seed
-from src.utils.config_utils import ConfigManager
+from utils.config_utils import ConfigManager
 from model.model_loader import model_loader
 from Dataset.dataloader import get_train_val_loader
 from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader, CombinedWeightedLoss
