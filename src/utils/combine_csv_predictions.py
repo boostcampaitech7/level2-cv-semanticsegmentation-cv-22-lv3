@@ -30,9 +30,22 @@ def merge_and_replace_rle(csv1_path: str, csv2_path: str, output_path: str, clas
     for i in classes: 
         print(
             f"'{i}' 클래스의 예측값이 다른 이미지 개수: "
-            f"{sum(csv1[csv1['class'] == i]['rle'] == csv2[csv2['class'] == i]['rle'])}"
+            f"{sum(csv1[csv1['class'] == i]['rle'] != csv2[csv2['class'] == i]['rle'])}"
         )
     
+    # NA값 확인
+    for num in range(2):
+        file_1, file_2 = csv1, csv2
+        if num == 1:
+            file_1, file_2 = csv2, csv1
+        if file_1['rle'].isna().any(): 
+            image_name = file_1[file_1['rle'].isna()]['image_name']
+            cls_name = file_1[file_1['rle'].isna()]['class']
+            for i, j in zip(image_name, cls_name): 
+                rle = file_2[(file_2['image_name']==i) & (file_2['class']==j)]['rle']
+                file_1[(file_1['image_name']==i) & (file_1['class']==j)] = rle
+
+
     # csv2에서 특정 클래스(classes)만 필터링
     csv2_radius = csv2[csv2['class'].isin(classes)]
 
@@ -58,18 +71,12 @@ def merge_and_replace_rle(csv1_path: str, csv2_path: str, output_path: str, clas
 
 
 if __name__ == "__main__":
-    # 파일 경로 설정
-    csv1_path = "../../results/SJH_SR.csv"
-    csv2_path = "../../results/unet_effib7_aug.csv"
-    output_path = "../../results/merged_result.csv"
-    classes = ['Radius']
-
     parser = argparse.ArgumentParser(description="Merge csv files")
     parser.add_argument('--csv1', type=str, default="../../results/SJH_SR.csv", 
                         help="기반이 될 csv 경로")
     parser.add_argument('--csv2', type=str, default="../../results/unet_effib7_aug.csv", 
                         help='특정 class의 rle값을 가져올 csv 경로')
-    parser.add_argument('--output', type=str, default="../../results/merged_result.csv",
+    parser.add_argument('--output', type=str, default="../../results/merged_result2.csv",
                         help='병합된 csv를 저장할 경로')
     parser.add_argument('--classes', type=list, default=['Radius'], 
                         help='csv2에서 가져올 rle값의 클래스를 담은 리스트')
