@@ -42,8 +42,8 @@ def merge_and_replace_rle(csv1_path: str, csv2_path: str, output_path: str, clas
             image_name = file_1[file_1['rle'].isna()]['image_name']
             cls_name = file_1[file_1['rle'].isna()]['class']
             for i, j in zip(image_name, cls_name): 
-                rle = file_2[(file_2['image_name']==i) & (file_2['class']==j)]['rle']
-                file_1[(file_1['image_name']==i) & (file_1['class']==j)] = rle
+                rle = list(file_2[(file_2['image_name']==i) & (file_2['class']==j)]['rle'])
+                file_1.loc[(file_1['image_name'] == i) & (file_1['class'] == j), 'rle'] = rle
 
 
     # csv2에서 특정 클래스(classes)만 필터링
