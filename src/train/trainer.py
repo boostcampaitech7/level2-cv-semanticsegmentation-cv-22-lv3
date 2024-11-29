@@ -114,7 +114,7 @@ def train(model, train_loader, val_loader, criterion, optimizer, scheduler, conf
             scheduler.step()   
 
             if (epoch + 1) % config.data.valid.interval == 0:
-                dice = validation(epoch + 1, model, stage_valloader, criterion, config=config)  
+                dice = validation(model, stage_valloader, config=config)  
 
                 save_model(model, file_name=f'epoch_{epoch+1}_model', config=config)
                 print(f"Save epoch {epoch+1} model in {config.save.save_ckpt}")
