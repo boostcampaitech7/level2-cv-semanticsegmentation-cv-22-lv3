@@ -1,0 +1,19 @@
+# config/augmentations/default.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: HorizontalFlip
+    params:
+      p: 0.5
+  - type: VerticalFlip
+    params:
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+
