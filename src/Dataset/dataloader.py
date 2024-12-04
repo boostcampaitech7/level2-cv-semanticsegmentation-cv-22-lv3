@@ -8,14 +8,22 @@ from Dataset.dataset import XRayDataset
 from Dataset.transform import get_transforms
 
 
-
 def load_config(config_path: str):
+    '''
+        summary : config파일을 로드
+        args : config 파일
+        retun : OmegaConf로 로드한 config 파일
+    '''
     config = OmegaConf.load(config_path)
     return config
 
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:
-
+    '''
+        summary : train, val의 dataloader를 생성
+        args : config 파일
+        retun : trainloader와 valloader
+    '''
     train_datasets = XRayDataset(
         mode = 'train',
         transforms = get_transforms(config.get('augmentation', {}).get('train', [])),
@@ -37,7 +45,6 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         drop_last = config.data.train.drop_last
     )
 
-
     val_loader = DataLoader(
         dataset = val_datasets,
         batch_size = config.data.valid.batch_size,
@@ -51,12 +58,16 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
 
 
 def get_test_loader(config : Dict[str, Any]) -> DataLoader : 
+    '''
+        summary : test데이터 Loader를 생성
+        args : config 파일
+        retun : Test Data Loader
+    '''
     test_datasets = XRayDataset(
         mode = 'test',
         transforms = get_transforms(config.get('augmentation', {}).get('test', [])),
         config = config
     )
-
 
     test_loader = DataLoader(
         dataset = test_datasets,
