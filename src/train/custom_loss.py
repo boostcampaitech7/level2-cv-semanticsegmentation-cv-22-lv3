@@ -32,7 +32,7 @@ class WeightedFocalLoss(nn.Module):
         elif alpha is None:
             self.alpha = torch.ones(29, dtype=torch.float32)  
         else:
-            raise TypeError("alpha must be float, list, tuple, or None")
+            raise TypeError('alpha must be float, list, tuple, or None')
 
     def forward(self, logits: torch.Tensor, targets: torch.Tensor, 
                 weight_maps: torch.Tensor) -> torch.Tensor:
@@ -260,9 +260,9 @@ class BCEDiceLoss(nn.Module):
         주로 세그멘테이션 작업에 사용되며 두 손실의 합을 최종 손실로 반환합니다.
 
     args:
-        dice_mode (str): Dice Loss의 계산 모드. 기본값은 "multilabel".
+        dice_mode (str): Dice Loss의 계산 모드. 기본값은 'multilabel'.
     '''
-    def __init__(self, dice_mode="multilabel"):
+    def __init__(self, dice_mode='multilabel'):
         super(BCEDiceLoss, self).__init__()
         self.bce = nn.BCEWithLogitsLoss()  
         self.dice = smp.losses.DiceLoss(mode=dice_mode) 
