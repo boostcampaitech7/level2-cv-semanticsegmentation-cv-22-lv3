@@ -14,9 +14,12 @@ PALETTE = [
 
 def label2rgb_multi(label):
     '''
-        summary : 다중 클래스 라벨을 RGB로 변경
-        args : 라벨 ndarray (클래스 수, 너비, 높이)
-        return : RGB로 변경된 ndarray 리스트
+        summary : 
+            다중 클래스 라벨을 시각화 하기 위한 RGB 형태로 변경합니다.
+        args : 
+            라벨 ndarray, (클래스 수, 너비, 높이) 크기
+        return : 
+            RGB로 변경된 image ndarray 리스트
     '''
     image_size = label.shape[1:] + (3, ) 
     image = np.zeros(image_size, dtype=np.float32)
@@ -33,9 +36,14 @@ def label2rgb_multi(label):
 
 def visualize_predictions(pred, mask, image=None):
     '''
-        summary : 예측값과 정답을 시각화
-        args : 예측된 마스크 배열, 정답 마스크 배열, 원본 이미지 배열
-        return : 시각화 결과 Figure 객체 (예측결과, 원본이미지, TP, FP, Overlay)
+        summary : 
+            예측 시각화, 정답 시각화, FN, FP 를 시각화 하여 모델이 잘잡지 못하는 부분과 잘 잡는 부분을 시각화 합니다.
+        args : 
+            pred : 예측된 마스크 배열
+            mask : 정답 마스크 배열
+            image : 원본 이미지 배열
+        return : 
+            시각화 결과 Figure 객체 (예측결과, 원본이미지, TP, FP, Overlay)
     '''
     pred_rgb = label2rgb_multi(pred)
     mask_rgb = label2rgb_multi(mask)
@@ -86,9 +94,12 @@ def visualize_predictions(pred, mask, image=None):
 
 def save_image_for_visualization(config, masks, preds_to_visualize, outputs, masks_to_visualize):
     '''
-        summary : 원하는 갯수의 이미지 시각화를 위해 예측 결과와 정답 마스크를 준비
-        args : config파일, 정답 마스크 데이터, 시각화할 에측 결과 저장리스트, 모델의 에측 출력, 시각화할 실제 마스크 저장 리스트
-        return : 업데이트 된 preds_to_visiualize 리스트와 masks_to_visalize'리스트 반환
+        summary : 
+            원하는 갯수의 이미지 시각화를 위해 예측 결과와 정답 마스크를 설정하게 됩니다.
+        args : 
+            config파일, 정답 마스크 데이터, 시각화할 에측 결과 저장리스트, 모델의 에측 출력, 시각화할 실제 마스크 저장 리스트
+        return : 
+            업데이트 된 preds_to_visiualize 리스트와 masks_to_visalize'리스트 
     '''
     if masks.ndim == 3:
         num_classes = len(config.data.classes)

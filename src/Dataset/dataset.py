@@ -14,11 +14,15 @@ from Dataset.transform import get_transforms
 from Dataset.split_dataset.splitdata import split_data
 
 
+
 def load_config(config_path: str):
     '''
-        summary : config파일을 로드
-        args : config 파일
-        retun : OmegaConf로 로드한 config 파일
+        summary : 
+            config파일을 OmegaConf를 통해 로드합니다.
+        args : 
+            config 파일 경로
+        retun : 
+            OmegaConf로 로드된 config 파일
     '''
     config = OmegaConf.load(config_path)
     return config
@@ -26,9 +30,12 @@ def load_config(config_path: str):
 
 def check_image_label_pair(config) -> tuple[list[str], list[str]]:
     '''
-        summary : 이미지이름과 라벨이름이 동일하고 갯수가 맞는지 확인한다
-        args : config 파일
-        retun : 이미지리스트와 라벨 리스트
+        summary : 
+            이미지이름과 라벨이름이 동일하고 갯수가 맞는지 확인한다
+        args : 
+            config 파일
+        retun : 
+            이미지리스트와 라벨 리스트
     '''
     train_data_path = config.data.train_data_path
     train_label_path = config.data.train_label_path

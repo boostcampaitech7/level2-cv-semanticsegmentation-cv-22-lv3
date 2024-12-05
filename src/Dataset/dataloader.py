@@ -10,9 +10,12 @@ from Dataset.transform import get_transforms
 
 def load_config(config_path: str):
     '''
-        summary : config파일을 로드
-        args : config 파일
-        retun : OmegaConf로 로드한 config 파일
+        summary : 
+            config파일을 OmegaConf를 통해 로드합니다.
+        args : 
+            config 파일 경로
+        retun : 
+            OmegaConf로 로드된 config 파일
     '''
     config = OmegaConf.load(config_path)
     return config
@@ -20,9 +23,12 @@ def load_config(config_path: str):
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:
     '''
-        summary : train, val의 dataloader를 생성
-        args : config 파일
-        retun : trainloader와 valloader
+        summary : 
+            데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 train_laoder와 val_loader를 생성합니다.
+        args : 
+            config 파일
+        retun : 
+            trainloader와 valloader
     '''
     train_datasets = XRayDataset(
         mode = 'train',
@@ -56,9 +62,12 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
 
 def get_test_loader(config : Dict[str, Any]) -> DataLoader : 
     '''
-        summary : test데이터 Loader를 생성
-        args : config 파일
-        retun : Test Data Loader
+        summary : 
+            데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 test_loader를 생성합니다.
+        args : 
+            config 파일
+        retun : 
+            Test Data Loader
     '''
     test_datasets = XRayDataset(
         mode = 'test',

@@ -4,9 +4,12 @@ from omegaconf import OmegaConf
 
 def get_transforms(augmentations_config) -> Callable:
     '''
-        summary : config파일의 증강 기법을 albumentation으로 적용
-        args : base config 파일
-        retun : 설정된 증강 기법들을 포함하는 변환 함수
+        summary : 
+            config파일의 증강 기법을 albumentation으로 적용해줍니다.
+        args : 
+            base config 파일
+        retun : 
+            설정된 증강 기법들을 포함하는 변환 함수
     '''
     augmentations_config = OmegaConf.to_container(augmentations_config, resolve=True)
     transforms_list = []

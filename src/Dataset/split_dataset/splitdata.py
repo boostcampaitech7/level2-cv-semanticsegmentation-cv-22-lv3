@@ -3,9 +3,18 @@ from sklearn.model_selection import GroupKFold, KFold
 
 def split_data(_imagenames: list, _labelnames: list, groups: list, config: dict, mode: str = 'train', split_method: str = 'GroupKFold') -> tuple[list, list]:
     '''
-        summary : split_method에 맞는 방식으로 Train/Val을 분할합니다.
-        args : 이미지 이름, 라벨이름, 그룹, config파일, 모드, 분할 방법
-        returns : 분할된 이미지와 라벨 리스트
+        summary : 
+            split_method에 맞는 방식으로 Train/Val을 n_split 갯수만큼 분할합니다.
+        args
+            _imagenames : 이미지 이름 리스트
+            _labelnames : 라벨 이름 리스트들
+            grouops : GroupKFold를 위한 더미 데이터
+            config : method, nssplit 정보가 담긴 파일
+            mode : 학습 모드 설정 
+            split_method : 분할 방법 
+            
+        returns
+            train, val에 맞게 설정된 (image, label) 튜플 리스트
     '''
     if split_method == 'GroupKFold':
         n_splits = config.data.get('n_splits', config.data.splits)
