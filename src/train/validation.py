@@ -10,13 +10,11 @@ from model.utils.model_output import get_model_output
 from Dataset.visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
-def validation(epoch, model, data_loader, criterion, config=None):
+def validation(model, data_loader, config=None):
+    epoch = config.data.train.max_epoch
     print(f'Start validation #{epoch:2d}')
-    set_seed(config.seed)
     model.eval()
     dices = []
-    total_loss = 0
-    cnt = 0
 
     preds_to_visualize = []
     masks_to_visualize = []
@@ -45,15 +43,7 @@ def validation(epoch, model, data_loader, criterion, config=None):
 
             if output_h != mask_h or output_w != mask_w:
                 outputs = F.interpolate(outputs, size=(mask_h, mask_w), mode=config.data.interpolate.bilinear)
-
-
-            if config.loss_func.weight_map == True :
-                loss = criterion(outputs, masks, weight_maps)
-            else:
-                loss = criterion(outputs, masks)
-
-            total_loss += loss.item()
-            cnt += 1
+            
 
             outputs = torch.sigmoid(outputs)
             thr = config.data.valid.threshold

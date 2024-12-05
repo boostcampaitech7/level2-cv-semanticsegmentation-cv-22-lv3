@@ -56,8 +56,8 @@ data :
 inference:
   threshold: 0.5
   output_size: [2048, 2048] 
-  checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/lraspp_mobilenet/lraspp_mobilenet_v3_large_best_model.pt"  # .ckpt에서 .pt로 수정
-  output_dir: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/results"
+  checkpoint_path: "../checkpoints/best_model.pt"  # .ckpt에서 .pt로 수정
+  output_dir: "../results"
   mode: 'gpu'
 
 
@@ -108,8 +108,10 @@ augmentation:
 
 
 loss_func: 
-  weight_map : None
-  name: BCEDiceLoss # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss,  CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
+  weight_map : True
+  # loss_func: BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
+  #            CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
+  name: CombinedWeightedLoss
 
 loss_func_defaults:
   BCEWithLogitsLoss: {}
@@ -133,13 +135,10 @@ loss_func_defaults:
 
 
 optimizer: 
-  name: AdamW # Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
+  # optimizer: Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
+  name: AdamW
   params:
     lr: 1e-4
-    weight_decay: 1e-2
-    betas: [0.9, 0.999]
-    eps: 1e-08
-    amsgrad: false
 
 optimizer_defaults:
   Adam:
@@ -169,7 +168,9 @@ optimizer_defaults:
 
 
 scheduler:
-  name: CosineAnnealingLR   # CosineAnnealingLR, StepLR, ReduceLROnPlateau, ExponentialLR, MultiStepLR, CosineAnnealingWarmRestarts
+  # scheduler: CosineAnnealingLR, StepLR, ReduceLROnPlateau, 
+  #            ExponentialLR, MultiStepLR, CosineAnnealingWarmRestarts
+  name: CosineAnnealingLR
   params:
     T_max: 50
 
@@ -205,9 +206,9 @@ scheduler_defaults:
 
 
 
-debug: False
+debug: True
 save:
-  save_config: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs
-  save_ckpt: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints
+  save_config: ../configs
+  save_ckpt: ../checkpoints
 
 seed: 42
