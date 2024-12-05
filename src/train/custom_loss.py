@@ -7,12 +7,11 @@ import segmentation_models_pytorch as smp
 class WeightedFocalLoss(nn.Module):
     '''
     summary: 
-        가중치와 Focal Loss를 결합한 손실 함수 클래스. 클래스 불균형 문제에 적합하며, 
-        입력된 알파(alpha) 및 감마(gamma) 값을 활용하여 Focal Loss를 계산합니다.
+        가중치와 Focal Loss를 결합한 손실 함수 클래스. 
 
     args:
-        alpha (float | list | tuple | None): 클래스별 가중치 값. 
-                                             None이면 모든 클래스의 가중치를 1로 설정합니다.
+        alpha (float | list | tuple | None): 클래스별 가중치 값.
+                                             None이면 모든 클래스의 가중치를 1로 설정.
         gamma (float): Focal Loss의 감마 값. 기본값은 2.0.
         smooth (float): 안정성을 위한 작은 값. 기본값은 1e-6.
         reduction (str): 결과 손실값의 축소 방법 ('mean', 'sum', 'none'). 기본값은 'mean'.
@@ -79,7 +78,7 @@ class WeightedFocalLoss(nn.Module):
 class WeightedBCEWithLogitsLoss(nn.Module):
     '''
     summary: 
-        가중치를 적용한 BCEWithLogits 손실 함수 클래스입니다. 
+        가중치를 적용한 BCEWithLogits 손실 함수 클래스. 
         픽셀 단위 가중치 맵(weight_maps)을 활용하여 손실 값을 조정합니다.
 
     args:
@@ -89,7 +88,8 @@ class WeightedBCEWithLogitsLoss(nn.Module):
 
         super(WeightedBCEWithLogitsLoss, self).__init__()
         self.smooth = smooth
-        self.bce = nn.BCEWithLogitsLoss(reduction='none')  # 개별 손실 계산을 위해 reduction='none' 사용
+        # 개별 손실 계산을 위해 reduction='none' 사용
+        self.bce = nn.BCEWithLogitsLoss(reduction='none')
 
     def forward(self, logits: torch.Tensor, targets: torch.Tensor, 
                 weight_maps: torch.Tensor) -> torch.Tensor:
@@ -104,7 +104,7 @@ class WeightedBCEWithLogitsLoss(nn.Module):
             weight_maps (torch.Tensor): 픽셀 가중치 맵.
 
         return:
-            torch.Tensor: 계산된 가중 BCEWithLogits 손실 값. 평균 손실 값을 반환합니다.
+            torch.Tensor: 계산된 가중 BCEWithLogits 평균 손실 값.
         '''
         loss = self.bce(logits, targets)        
         weighted_loss = loss * weight_maps        
@@ -114,7 +114,7 @@ class WeightedBCEWithLogitsLoss(nn.Module):
 class WeightedDiceLoss(nn.Module):
     '''
     summary: 
-        가중치를 적용한 Dice 손실 함수 클래스입니다. 
+        가중치를 적용한 Dice 손실 함수 클래스.
         픽셀 단위 가중치 맵(weight_maps)을 활용하여 Dice 손실을 계산합니다.
 
     args:
@@ -137,7 +137,7 @@ class WeightedDiceLoss(nn.Module):
             weight_maps (torch.Tensor): 픽셀 가중치 맵.
 
         return:
-            torch.Tensor: 계산된 가중 Dice 손실 값. 평균 손실 값을 반환합니다.
+            torch.Tensor: 계산된 가중 Dice 평균 손실 값. 
         '''
         probs = torch.sigmoid(logits)
         intersection = (probs*targets*weight_maps).sum(dim=(2,3))
@@ -148,12 +148,10 @@ class WeightedDiceLoss(nn.Module):
         return loss.mean()
 
 
-# 위에서 정의한 3가지 loss를 이용하여 hybrid loss 정의
-
 class CombinedWeightedLoss(nn.Module):
     '''
     summary:
-        Dice Loss, BCEWithLogits Loss, Focal Loss를 가중치 기반으로 결합한 손실 함수 클래스입니다. 
+        Dice Loss, BCEWithLogits Loss, Focal Loss를 가중치 기반으로 결합한 손실 함수 클래스
         내부 영역과 경계 영역에 각각 다른 가중치를 부여하여 손실을 계산합니다.
 
     args:
@@ -195,7 +193,7 @@ class CombinedWeightedLoss(nn.Module):
             weight_maps (torch.Tensor): 픽셀 가중치 맵.
 
         return:
-            torch.Tensor: 계산된 총 손실 값. 스칼라 값을 반환합니다.
+            torch.Tensor: 계산된 총 손실 값.
         '''
         dice_loss = self.dice(logits, targets, weight_maps)
         bce_loss = self.bce(logits, targets, weight_maps)
@@ -212,7 +210,7 @@ nINF = -100
 class TwoWayLoss(nn.Module):
     '''
     summary:
-        TwoWayLoss는 양방향 손실을 계산하는 클래스입니다. 
+        TwoWayLoss는 양방향 손실을 계산하는 클래스.
         양성(positive)과 음성(negative) 샘플에 대해 
         서로 다른 온도 스케일(Tp, Tn)을 적용하여 손실을 계산합니다.
 
@@ -256,7 +254,7 @@ class TwoWayLoss(nn.Module):
 class BCEDiceLoss(nn.Module):
     '''
     summary:
-        BCEWithLogits 손실과 Dice 손실을 결합한 손실 함수 클래스입니다. 
+        BCEWithLogits 손실과 Dice 손실을 결합한 손실 함수 클래스.
         주로 세그멘테이션 작업에 사용되며 두 손실의 합을 최종 손실로 반환합니다.
 
     args:
