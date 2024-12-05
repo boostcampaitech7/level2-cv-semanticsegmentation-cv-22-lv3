@@ -1,3 +1,5 @@
+import torch.nn as nn
+
 def update_last_layer(model, new_out_channels):
     if hasattr(model, 'classifier'):
         classifier = model.classifier

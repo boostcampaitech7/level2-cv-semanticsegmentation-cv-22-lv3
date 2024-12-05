@@ -1,12 +1,12 @@
 import wandb
 import argparse
 from omegaconf import OmegaConf
-from utils.set_seed import set_seed
-from utils.config_utils import ConfigManager
-from model.model_loader import model_loader
+from Utils.set_seed import set_seed
+from Utils.config_utils import ConfigManager
+from Model.model_loader import model_loader
 from Dataset.dataloader import get_train_val_loader
-from train.trainer import train
-from train.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
+from src.Train.trainer import train
+from src.Train.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 
 
 def do_train(cfg: OmegaConf, project_name: str, run_name: str) -> None:
@@ -68,6 +68,7 @@ if __name__ == '__main__':
                         help='Write a wandb run name')
     args = parser.parse_args()
 
+
     config_manager = ConfigManager(
         base_config=args.config, 
         model_config=args.model, 
@@ -75,5 +76,4 @@ if __name__ == '__main__':
         )
     
     config = config_manager.load_config()
-
     do_train(config, args.project_name, args.run_name)

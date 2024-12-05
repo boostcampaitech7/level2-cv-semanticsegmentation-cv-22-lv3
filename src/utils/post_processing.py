@@ -1,13 +1,10 @@
 import os
-import cv2
-import numpy as np
-import pandas as pd
-import torch
-import argparse
-from datetime import datetime
-from tqdm import tqdm
 import pytz
-from inference_utils import simple_postprocessing, encode_mask_to_rle, decode_rle_to_mask
+import argparse
+import pandas as pd
+from tqdm import tqdm
+from datetime import datetime
+from inference_utils import postprocessing_with_sharpening, encode_mask_to_rle, decode_rle_to_mask
 
 
 # 샤프닝 필터 적용 및 모폴로지 연산을 통해 예측 이미지의 가장자리를 뚜렷하게 합니다.
@@ -22,7 +19,7 @@ if __name__ == '__main__':
 
     for idx in tqdm(range(len(df)), desc='Post-processing'):
         original_mask = decode_rle_to_mask(df.iloc[idx]['rle'])
-        processed_mask = simple_postprocessing(
+        processed_mask = postprocessing_with_sharpening(
             original_mask, 
             threshold=args.threshold
         )

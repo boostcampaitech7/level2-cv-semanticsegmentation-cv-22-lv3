@@ -3,10 +3,11 @@ import argparse
 from tqdm import tqdm
 import torch.nn.functional as F
 from omegaconf import OmegaConf
-from model.model_loader import model_loader
+from Model.model_loader import model_loader
+from Model.utils.load_model import load_model
 from Dataset.dataloader import get_test_loader
-from model.utils.model_output import get_model_output
-from utils.inference_utils import load_model, encode_mask_to_rle, encode_mask_to_rle_gpu, save_to_csv, prepare_inference_environment
+from Model.utils.model_output import get_model_output
+from Utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, save_to_csv, prepare_inference_environment
 
 
 def do_inference(config : OmegaConf) -> str:

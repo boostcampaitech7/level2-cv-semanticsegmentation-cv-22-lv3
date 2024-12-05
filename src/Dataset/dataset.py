@@ -1,31 +1,12 @@
 import os
 import cv2
 import json
-import yaml
 import torch
-import argparse
 import numpy as np
-import albumentations as A
 from omegaconf import OmegaConf
-import matplotlib.pyplot as plt
 from typing import Dict, Any, Tuple
 from torch.utils.data import Dataset
-from Dataset.transform import get_transforms
-from Dataset.split_dataset.splitdata import split_data
-
-
-
-def load_config(config_path: str):
-    '''
-        summary : 
-            config파일을 OmegaConf를 통해 로드합니다.
-        args : 
-            config 파일 경로
-        retun : 
-            OmegaConf로 로드된 config 파일
-    '''
-    config = OmegaConf.load(config_path)
-    return config
+from Dataset.utils.splitdata import split_data
 
 
 def check_image_label_pair(config) -> tuple[list[str], list[str]]:
@@ -123,7 +104,7 @@ class XRayDataset(Dataset):
             self.labelnames = []  
 
         else:
-            raise ValueError("Invalid mode. Choose 'train', 'val', or 'test'.")
+            raise ValueError('Invalid mode. Choose "train", "val", or "test".')
 
 
         self.boundary_width = config.loss_func.get('boundary_width', 5)

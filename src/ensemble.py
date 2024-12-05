@@ -6,7 +6,8 @@ from datetime import datetime
 import pytz
 from tqdm import tqdm
 import torch
-from utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, decode_rle_to_mask, decode_rle_to_mask_gpu
+from Utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, decode_rle_to_mask, decode_rle_to_mask_gpu
+
 
 def validate_csv_files(dataframes : pd.DataFrame) -> bool:
     '''
@@ -36,6 +37,7 @@ def validate_csv_files(dataframes : pd.DataFrame) -> bool:
                 raise ValueError(f'Image_name or class does not match in the {idx} index.')
     
     return True
+
 
 def perform_ensemble(dataframes : pd.DataFrame, mode : str ='gpu') -> pd.DataFrame:
     '''
@@ -89,6 +91,7 @@ def perform_ensemble(dataframes : pd.DataFrame, mode : str ='gpu') -> pd.DataFra
         'rle': final_rles
     })
 
+
 def save_ensemble_result(df : pd.DataFrame, base_dir : str) -> str:
     '''
     앙상블 결과를 CSV 파일로 저장합니다.
@@ -114,6 +117,7 @@ def save_ensemble_result(df : pd.DataFrame, base_dir : str) -> str:
     
     return output_filepath
 
+
 def main():
     '''
     CSV 파일들을 Hard Voting 방식으로 앙상블하는 메인 함수입니다.
@@ -133,6 +137,7 @@ def main():
     output_filepath = save_ensemble_result(final_df, base_dir)
     
     print(f'Results saved to: {output_filepath}')
+
 
 if __name__ == '__main__':
     main()

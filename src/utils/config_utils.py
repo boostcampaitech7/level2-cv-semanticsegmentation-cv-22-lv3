@@ -118,4 +118,4 @@ class ConfigManager:
         os.makedirs(save_ckpt_dir, exist_ok=True)
         config.save['save_ckpt'] = save_ckpt_dir
 
-        return
+        return None

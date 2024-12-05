@@ -1,24 +1,9 @@
 
-import yaml
-import argparse
 from omegaconf import OmegaConf
 from typing import Dict, Any, Tuple
 from torch.utils.data import DataLoader
 from Dataset.dataset import XRayDataset
-from Dataset.transform import get_transforms
-
-
-def load_config(config_path: str):
-    '''
-        summary : 
-            config파일을 OmegaConf를 통해 로드합니다.
-        args : 
-            config 파일 경로
-        retun : 
-            OmegaConf로 로드된 config 파일
-    '''
-    config = OmegaConf.load(config_path)
-    return config
+from src.Dataset.utils.transform import get_transforms
 
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:

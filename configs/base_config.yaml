@@ -1,8 +1,8 @@
 # 데이터 및 훈련 관련 설정
 data :
-  train_data_path : '../../data/train/DCM'
-  train_label_path : '../../data/train/outputs_json'
-  test_data_path : '../../data/test/DCM'
+  train_data_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/DCM'
+  train_label_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/outputs_json'
+  test_data_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/DCM'
 
 
   classes : [
@@ -13,6 +13,7 @@ data :
     'Trapezoid', 'Capitate', 'Hamate', 'Scaphoid', 'Lunate',
     'Triquetrum', 'Pisiform', 'Radius', 'Ulna',
 ]
+
 
   fold : 0
   split_method : GroupKFold
@@ -56,7 +57,7 @@ data :
 inference:
   threshold: 0.5
   output_size: [2048, 2048] 
-  checkpoint_path: "../checkpoints/best_model.pt"  # .ckpt에서 .pt로 수정
+  checkpoint_path: "../checkpoints/best_model.pt"  
   output_dir: "../results"
   mode: 'gpu'
 
@@ -205,10 +206,11 @@ scheduler_defaults:
     last_epoch: -1    
 
 
-
 debug: True
 save:
   save_config: ../configs
   save_ckpt: ../checkpoints
 
 seed: 42
+
+

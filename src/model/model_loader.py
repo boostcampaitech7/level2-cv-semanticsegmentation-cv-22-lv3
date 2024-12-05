@@ -1,14 +1,17 @@
 import torch
 import importlib
-from model.utils.modify_model import update_last_layer
-from src.utils.inference_utils import load_model
+from Model.utils.modify_model import update_last_layer
+from src.Model.utils import load_model
+
 
 def model_loader(config):
-    
     '''
-    summary : 설정(config)에 따라 모델을 로드합니다.
-    args : 모델 설정이 포함된 구성 객체
-    return : 로드된 모델 객체
+        summary : 
+            설정(config)에 따라 모델을 로드합니다.
+        args : 
+            모델 설정이 포함된 구성 객체
+        return : 
+            로드된 모델 객체
     '''
 
     model_cfg = config.model
@@ -36,7 +39,7 @@ def model_loader(config):
             model = target_model(**architecture_params)
             model = update_last_layer(model, num_classes)
             print(f'Loaded torchvision model: {base_model} with {num_classes} classes.')
-        
+         
         else:
             model = target_model(**architecture_params)        
             print(f'Loaded SMP model: {base_model} with {num_classes} classes.')    

@@ -3,9 +3,9 @@ import torch.nn.functional as F
 import wandb
 from omegaconf import OmegaConf
 from tqdm.auto import tqdm
-from utils.metrics import dice_coef
-from model.utils.model_output import get_model_output
-from Dataset.visualization.train_vis import visualize_predictions, save_image_for_visualization
+from metrics.metrics import dice_coef
+from Model.utils.model_output import get_model_output
+from src.Visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
 def validation(model: torch.nn.Module, 

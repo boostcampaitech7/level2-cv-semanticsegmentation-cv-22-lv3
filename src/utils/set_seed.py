@@ -11,8 +11,6 @@ def set_seed(seed : int) -> None:
     args : 
         seed : 고정할 랜덤 시드 값
 
-    return :
-        반환값이 없습니다.
     '''
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
@@ -22,4 +20,4 @@ def set_seed(seed : int) -> None:
     np.random.seed(seed)
     random.seed(seed)
 
-    return
+    return None
