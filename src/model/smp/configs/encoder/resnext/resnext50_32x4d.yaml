@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "resnext50_32x4d"
-    encoder_weights: "imagenet"
+    encoder_name: 'resnext50_32x4d'
+    encoder_weights: 'imagenet'

@@ -1,5 +1,9 @@
 model:
-  library: "torchvision"
+  module: 'torchvision.models.segmentation'
+  library: 'torchvision'
+  checkpoint: None
+  base_model: 'fcn_resnet101'
   architecture:
-    base_model: "fcn_resnet101"
-    pretrained: True
+    weights: 'FCN_ResNet101_Weights.DEFAULT'
+    progress: True
+    aux_loss: False

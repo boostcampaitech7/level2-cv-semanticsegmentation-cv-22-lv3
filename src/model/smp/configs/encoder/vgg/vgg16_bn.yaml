@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "vgg16_bn"
-    encoder_weights: "imagenet"
+    encoder_name: 'vgg16_bn'
+    encoder_weights: 'imagenet'
