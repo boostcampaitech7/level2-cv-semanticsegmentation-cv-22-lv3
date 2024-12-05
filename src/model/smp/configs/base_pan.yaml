@@ -2,7 +2,7 @@ model:
   module: 'segmentation_models_pytorch'
   library: 'smp'
   base_model: 'PAN'
-  checkpoint: None
+  checkpoint: null
   architecture:
     encoder_name: 'resnet34'
     encoder_weights: 'imagenet'

@@ -1,7 +1,7 @@
 model:
   module: 'torchvision.models.segmentation'
   library: 'torchvision'
-  checkpoint: None
+  checkpoint: null
   base_model: 'fcn_resnet101'
   architecture:
     weights: 'FCN_ResNet101_Weights.DEFAULT'

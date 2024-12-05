@@ -81,8 +81,8 @@ class ConfigManager:
             반환값이 없습니다.
         '''
         kst = pytz.timezone('Asia/Seoul')
-        timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
-        base_model = config.model.architecture.base_model
+        timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
+        base_model = config.model.base_model
         encoder = config.model.architecture.encoder_name
         epoch = config.data.train.max_epoch
         file_name = f'{base_model}_epoch{epoch}.yaml'
@@ -110,8 +110,8 @@ class ConfigManager:
             반환값이 없습니다.
         '''
         kst = pytz.timezone('Asia/Seoul')
-        timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
-        base_model = config.model.architecture.base_model
+        timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
+        base_model = config.model.base_model
         encoder = config.model.architecture.encoder_name
         folder_name = f'{timestamp}_{base_model}_{encoder}_ckpt'
         save_ckpt_dir = os.path.join(config.save.save_ckpt, folder_name)

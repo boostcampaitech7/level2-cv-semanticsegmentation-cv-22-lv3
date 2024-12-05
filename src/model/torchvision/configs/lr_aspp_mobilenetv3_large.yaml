@@ -1,7 +1,7 @@
 model:
   module: 'torchvision.models.segmentation'
   library: 'torchvision'
-  checkpoint: None
+  checkpoint: null
   base_model: 'lraspp_mobilenet_v3_large'
   architecture:
     weights: 'LRASPP_MobileNet_V3_Large_Weights.DEFAULT'
