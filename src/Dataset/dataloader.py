@@ -8,20 +8,33 @@ from Dataset.dataset import XRayDataset
 from Dataset.transform import get_transforms
 
 
-
 def load_config(config_path: str):
+    '''
+        summary : 
+            config파일을 OmegaConf를 통해 로드합니다.
+        args : 
+            config 파일 경로
+        retun : 
+            OmegaConf로 로드된 config 파일
+    '''
     config = OmegaConf.load(config_path)
     return config
 
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:
-
+    '''
+        summary : 
+            데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 train_laoder와 val_loader를 생성합니다.
+        args : 
+            config 파일
+        retun : 
+            trainloader와 valloader
+    '''
     train_datasets = XRayDataset(
         mode = 'train',
         transforms = get_transforms(config.get('augmentation', {}).get('train', [])),
         config = config
     )
-
     val_datasets = XRayDataset(
         mode = 'val',
         transforms = get_transforms(config.get('augmentation', {}).get('valid', [])),
@@ -36,8 +49,6 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         pin_memory = config.data.train.pin_memory,
         drop_last = config.data.train.drop_last
     )
-
-
     val_loader = DataLoader(
         dataset = val_datasets,
         batch_size = config.data.valid.batch_size,
@@ -46,17 +57,23 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
         pin_memory = config.data.valid.pin_memory,
         drop_last = config.data.valid.drop_last
     )
-
     return train_loader, val_loader
 
 
 def get_test_loader(config : Dict[str, Any]) -> DataLoader : 
+    '''
+        summary : 
+            데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 test_loader를 생성합니다.
+        args : 
+            config 파일
+        retun : 
+            Test Data Loader
+    '''
     test_datasets = XRayDataset(
         mode = 'test',
         transforms = get_transforms(config.get('augmentation', {}).get('test', [])),
         config = config
     )
-
 
     test_loader = DataLoader(
         dataset = test_datasets,
@@ -69,49 +86,3 @@ def get_test_loader(config : Dict[str, Any]) -> DataLoader :
 
     return test_loader
 
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train Semantic Segmentation Model")
-    parser.add_argument('--config', type=str, default='configs/data_config.yaml', help='Path to the config file')
-    args = parser.parse_args()
-    config = load_config(args.config)
-
-
-    train_loader, val_loader = get_train_val_loader(config)
-    test_loader = get_test_loader(config)
-
-
-    print("Checking train loader...")
-    for images, labels in train_loader:
-        print(f"Train batch - images shape: {images.shape}, labels shape: {labels.shape}")
-        break  
-
-
-    print("Checking validation loader...")
-    for images, labels in val_loader:
-        print(f"Validation batch - images shape: {images.shape}, labels shape: {labels.shape}")
-        break  
-
-    # Test loader 확인
-    print("Checking test loader...")
-    for images, image_names in test_loader:
-        print(f"Test batch - images shape: {images.shape}, image names: {image_names}")
-        break  
-
-
-    print("\nDataset counts:")
-    print(f"Train dataset size: {len(train_loader.dataset)}")
-    print(f"Validation dataset size: {len(val_loader.dataset)}")
-    print(f"Test dataset size: {len(test_loader.dataset)}")
-
-
-    train_images = set(train_loader.dataset.imagenames)
-    val_images = set(val_loader.dataset.imagenames)
-    overlap = train_images.intersection(val_images)
-    if not overlap:
-        print("Train and Validation datasets do not overlap.")
-    else:
-        print(f"Overlap between Train and Validation datasets: {overlap}")
-
-
-    print(f"Total test images loaded: {len(test_loader.dataset)}")
