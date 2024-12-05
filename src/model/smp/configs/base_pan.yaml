@@ -1,9 +1,11 @@
 model:
-  library: "smp"
+  module: 'segmentation_models_pytorch'
+  library: 'smp'
+  base_model: 'PAN'
+  checkpoint: None
   architecture:
-    base_model: "PAN"
-    encoder_name: "resnet34"
-    encoder_weights: "imagenet"
+    encoder_name: 'resnet34'
+    encoder_weights: 'imagenet'
     encoder_output_stride: 16 # 16 or 32, if 16 use dilation in encoder last layer, Doesn’t work with *ception*, vgg*, densenet*`
     decoder_channels: 32 # A number of convolution layer filters in decoder blocks
     in_channels: 3

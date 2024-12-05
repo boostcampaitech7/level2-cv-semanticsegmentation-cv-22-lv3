@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "vgg13"
-    encoder_weights: "imagenet"
+    encoder_name: 'vgg13'
+    encoder_weights: 'imagenet'

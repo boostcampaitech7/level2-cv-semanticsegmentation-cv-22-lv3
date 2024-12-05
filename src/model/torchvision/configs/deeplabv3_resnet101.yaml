@@ -1,5 +1,9 @@
 model:
-  library: "torchvision"
+  module: 'torchvision.models.segmentation'
+  library: 'torchvision'
+  base_model: 'deeplabv3_resnet101'
+  checkpoint: None
   architecture:
-    base_model: "deeplabv3_resnet101"
-    pretrained: True
+    weights: 'DeepLabV3_ResNet101_Weights.DEFAULT'
+    progress: True
+    aux_loss: False

@@ -1,4 +1,5 @@
 model:
+  module: 'segmentation_models_pytorch'
   library: "smp"
   architecture:
     base_model: "Unet"
