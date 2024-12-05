@@ -40,7 +40,7 @@ class ConfigManager:
     def _save_config(self, config):
         kst = pytz.timezone('Asia/Seoul')
         timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
-        base_model = config.model.architecture.base_model
+        base_model = config.model.base_model
         encoder = config.model.architecture.encoder_name
         epoch = config.data.train.max_epoch
         file_name = f"{base_model}_epoch{epoch}.yaml"
@@ -57,7 +57,7 @@ class ConfigManager:
     def _save_ckpt(self, config):
         kst = pytz.timezone('Asia/Seoul')
         timestamp = datetime.now(kst).strftime("%Y%m%d_%H%M%S")
-        base_model = config.model.architecture.base_model
+        base_model = config.model.base_model
         encoder = config.model.architecture.encoder_name
         folder_name = f"{timestamp}_{base_model}_{encoder}_ckpt"
         save_ckpt_dir = os.path.join(config.save.save_ckpt, folder_name)
