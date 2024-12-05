@@ -1,0 +1,16 @@
+*.png
+*.json
+wandb
+checkpoints
+*.csv
+*.log
+baseline_code.py
+__pycache__
+*.__pycache__
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*2024*/ 
+*2025*/
+*.ipynb

@@ -1,0 +1,16 @@
+model:
+  library: "smp"
+  architecture:
+    base_model: "DeepLabV3"
+    encoder_name: "resnet34"
+    encoder_depth: 5  #[3, 5], default is 5
+    encoder_weights: "imagenet"
+    encoder_output_stride: 8 # Literal[8, 16]
+    decoder_channels: 256 
+    #decoder_atrous_rates: (12, 24, 36)
+    decoder_aspp_separable: False # Use separable conv in ASPP, Default is False
+    decoder_aspp_dropout: 0.5 # Use dropout in ASPP module projection layer. Default is 0.5
+    in_channels: 3
+    classes: 29
+    activation: null # “sigmoid”, “softmax”, “logsoftmax”, “tanh”, “identity”
+    upsampling: null # Final upsampling factor (should have the same value as encoder_output_stride to preserve input-output spatial shape identity).

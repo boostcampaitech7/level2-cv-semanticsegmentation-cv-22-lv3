@@ -1,0 +1,14 @@
+# config/augmentations/Resize1536.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 1536
+      width: 1536
+      p: 1.0
+val:
+  - type: Resize
+    params:
+      height: 1536
+      width: 1536
+

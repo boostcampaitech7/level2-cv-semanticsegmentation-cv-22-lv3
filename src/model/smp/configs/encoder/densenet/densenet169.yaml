@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: "densenet169"
+    encoder_weights: "imagenet"

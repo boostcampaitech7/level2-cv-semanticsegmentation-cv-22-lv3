@@ -1,0 +1,14 @@
+# config/augmentations/Resize1024.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 1024
+      width: 1024
+      p: 1.0
+val:
+  - type: Resize
+    params:
+      height: 1024
+      width: 1024
+
