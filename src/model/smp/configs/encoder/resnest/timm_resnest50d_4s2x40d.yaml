@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "timm-resnest50d_4s2x40d"
-    encoder_weights: "imagenet"
+    encoder_name: 'timm-resnest50d_4s2x40d'
+    encoder_weights: 'imagenet'

@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "efficientnet-b6"
-    encoder_weights: "imagenet"
+    encoder_name: 'efficientnet-b6'
+    encoder_weights: 'imagenet'

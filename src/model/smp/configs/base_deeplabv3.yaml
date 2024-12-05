@@ -1,10 +1,12 @@
 model:
-  library: "smp"
+  module: 'segmentation_models_pytorch'
+  library: 'smp'
+  base_model: 'DeepLabV3'
+  checkpoint: None
   architecture:
-    base_model: "DeepLabV3"
-    encoder_name: "resnet34"
+    encoder_name: 'resnet34'
     encoder_depth: 5  #[3, 5], default is 5
-    encoder_weights: "imagenet"
+    encoder_weights: 'imagenet'
     encoder_output_stride: 8 # Literal[8, 16]
     decoder_channels: 256 
     #decoder_atrous_rates: (12, 24, 36)
