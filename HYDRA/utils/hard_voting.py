@@ -88,7 +88,7 @@ csv_paths = [
     '/data/ephemeral/home/segmentation_baseline/level2-cv-semanticsegmentation-cv-22-lv3/output (4).csv',
     '/data/ephemeral/home/segmentation_baseline/level2-cv-semanticsegmentation-cv-22-lv3/output (5).csv'
 ]
-``
+
 # threshold 설정 및 실행
 for threshold in [3]:
     save_path = f"ensemble_threshold_{threshold}.csv"

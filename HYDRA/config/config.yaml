@@ -1,46 +1,147 @@
 # config.yaml
-
+#============================================================
+# 기본 설정
+#============================================================
 defaults:
-  - _self_
-  - model: unet_hrnet_w64
-  - augmentations: Resize1024_R
+  - _self_  
+  - model: SMP           # 모델 설정(예: SMP, segformer 등)
+  - augmentations: default  # augmentation 설정
 
-mode: 'train'  # Default mode
-
-model_path: null  # Initially set to null; can be specified via command line
+#============================================================
+# 작동 모드 및 경로 설정
+#============================================================
+mode: 'train'    # 'train', 'inference', 'both' 중 선택
+model_path: null  # 외부 모델 로드 시 사용, 기본적으로 null
 
 IMAGE_ROOT: './data/train/DCM'
 LABEL_ROOT: './data/train/outputs_json'
 TEST_IMAGE_ROOT: './data/test/DCM'
 
-BATCH_SIZE: 2
+#============================================================
+# 학습 파라미터
+#============================================================
+BATCH_SIZE: 4
 LR: 1e-4
 RANDOM_SEED: 2024
 
-NUM_EPOCHS_PHASE1: 100  # Number of epochs for Phase 1
-PHASE2_RATIO: 0.2       # Ratio of epochs for Phase 2 (20% of Phase 1)
+# Phase 1/2 학습 관련
+NUM_EPOCHS_PHASE1: 10    # Phase 1 epoch 수
+PHASE2_RATIO: 0.2         # Phase 1 epoch 대비 Phase 2 epoch 비율(예: 0.2면 Phase1의 20%)
 
-VAL_EVERY: 10
-SAVED_DIR: 'checkpoints'
-LOG_TOOL: 'wandb'  # Or 'tensorboard'
+VAL_EVERY: 2              # Validation 간격(epoch 단위)
+SAVED_DIR: 'checkpoints'  # 체크포인트 저장 경로
+LOG_TOOL: 'wandb'         # 로깅 툴: 'wandb' 또는 'tensorboard' 또는 'none'
 
-# Data splitting mode
-data_split_mode: 'two_phase'  # 'kfold' or 'two_phase'
+#============================================================
+# 데이터 분할 방식
+#============================================================
+data_split_mode: 'two_phase' # 'kfold' 또는 'two_phase' 선택
 
-# Early Stopping configuration
+#============================================================
+# Early Stopping 설정
+#============================================================
 early_stopping:
-  enabled: true        # Enable Early Stopping
-  patience: 5          # Number of epochs to wait for improvement
-  mode: 'max'          # 'max' or 'min' (e.g., val_dice is 'max', val_loss is 'min')
-  min_delta: 0.001     # Minimum change to qualify as an improvement
+  enabled: true        # Early Stopping 활성화 여부
+  patience: 5          # 개선 없이 기다릴 epoch 수
+  mode: 'max'          # 개선 모드: 'max' (예: val_dice), 'min' (예: val_loss)
+  min_delta: 0.001     # 개선으로 인정할 최소 변화량
 
-# Loss function mode
-loss_mode: 'multiclass'  # 'binary', 'multiclass', 'multilabel'
+#============================================================
+# Loss 및 Threshold 설정
+#============================================================
+loss_mode: 'multilabel' # 'binary', 'multiclass', 'multilabel'
+threshold: 0.5          # 이진화 Threshold
+output_size: [2048, 2048] # 최종 결과 resize 크기
 
-# Predefine new keys
-CLASS2IND: {}
-IND2CLASS: {}
+#============================================================
+# 추론(TTA) 설정
+#============================================================
+inference:
+  use_tta: false       # 추론 시 TTA 사용 여부
+  transforms:
+    - HorizontalFlip
+    - VerticalFlip
+    - Rotate90
+  # 필요할 경우 추가 TTA 변환을 나열할 수 있음
 
+inference_to_gpu: True  # RLE 인코딩 시 GPU 사용 여부
+
+#============================================================
+# Hydra 설정
+#============================================================
+hydra:
+  run:
+    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job_logging:
+    root:
+      handlers: null
+
+#============================================================
+# Optimizer 설정
+#============================================================
+optimizer:
+  name: 'adamw'  # 가능한 옵티마이저: 'adam', 'adamw', 'sgd', 'rmsprop', 'lion'
+  params: {}      # 기본값을 덮어쓸 경우 이곳에서 지정
+
+optimizer_defaults:
+  adam:
+    lr: 1e-4
+    weight_decay: 1e-5
+    betas: [0.9, 0.999]
+  adamw:
+    lr: 1e-4
+    weight_decay: 1e-2
+    betas: [0.9, 0.999]
+    eps: 1e-08
+    amsgrad: false
+  sgd:
+    lr: 1e-2
+    weight_decay: 1e-4
+    momentum: 0.9
+    nesterov: false
+  rmsprop:
+    lr: 1e-4
+    weight_decay: 1e-5
+    momentum: 0.9
+    alpha: 0.99
+  lion:
+    lr: 1e-4
+    weight_decay: 0.0
+    betas: [0.9, 0.99]
+
+#============================================================
+# Scheduler 설정
+#============================================================
+scheduler:
+  name: 'cosine_annealing'  # 'step_lr', 'reduce_on_plateau', 'cosine_annealing' 등
+  params: {}                # 추가 파라미터 오버라이드 가능
+
+scheduler_defaults:
+  step_lr:
+    step_size: 10
+    gamma: 0.1
+  reduce_on_plateau:
+    mode: 'max'
+    factor: 0.1
+    patience: 5
+    threshold: 0.0001
+    threshold_mode: 'rel'
+    cooldown: 0
+    min_lr: 0
+    eps: 1e-08
+  cosine_annealing:
+    T_max: 50
+    eta_min: 0
+
+#============================================================
+# Loss 함수 설정
+#============================================================
+loss:
+  name: 'dice'  # 가능한 값: 'bce', 'dice', 'jaccard', 'focal', 'tversky'
+
+#============================================================
+# 클래스, 색상 팔레트 설정
+#============================================================
 CLASSES:
   - 'finger-1'
   - 'finger-2'
@@ -103,81 +204,12 @@ PALETTE:
   - [188, 208, 182]
   - [0, 220, 176]
 
-threshold: 0.5
-output_size: [2048, 2048]
+CLASS2IND: {}
+IND2CLASS: {}
 
-# TTA 설정 추가
-inference:
-  use_tta: true  # 추론 시 TTA를 사용할지 여부 (true/false)
-  transforms:
-    - HorizontalFlip
-    - VerticalFlip
-    - Rotate90
-    # 필요에 따라 추가 변환을 여기에 나열할 수 있습니다.
-
-# Hydra configuration
-hydra:
-  run:
-    dir: ./outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
-  job_logging:
-    root:
-      handlers: null  # Configure logging
-
-# Optimizer configuration
-optimizer:
-  name: 'lion'  # Supported optimizers: 'adam', 'sgd', 'rmsprop', 'lion'
-  params: {}      # Optionally override default parameters
-
-optimizer_defaults:
-  adam:
-    lr: 1e-4
-    weight_decay: 1e-5
-    betas: [0.9, 0.999]
-  adamw:
-    lr: 1e-4
-    weight_decay: 1e-2
-    betas: [0.9, 0.999]
-    eps: 1e-08
-    amsgrad: false
-  sgd:
-    lr: 1e-2
-    weight_decay: 1e-4
-    momentum: 0.9
-    nesterov: false
-  rmsprop:
-    lr: 1e-4
-    weight_decay: 1e-5
-    momentum: 0.9
-    alpha: 0.99
-  lion:              # Lion optimizer default settings
-    lr: 1e-4
-    weight_decay: 0.0
-    betas: [0.9, 0.99]
-
-# Scheduler configuration
-scheduler:
-  name: 'cosine_annealing'  # Supported schedulers: 'step_lr', 'reduce_on_plateau', 'cosine_annealing', etc.
-  params: {}         # Optionally override default parameters
-
-scheduler_defaults:
-  step_lr:
-    step_size: 10
-    gamma: 0.1
-  reduce_on_plateau:
-    mode: 'max'
-    factor: 0.1
-    patience: 5
-    threshold: 0.0001
-    threshold_mode: 'rel'
-    cooldown: 0
-    min_lr: 0
-    eps: 1e-08
-  cosine_annealing:
-    T_max: 50
-    eta_min: 0
-
-# Loss 설정 추가
-loss:
-  name: 'dice'  # 사용 가능한 손실 함수: 'bce', 'dice', 'jaccard', 'focal', 'tversky'
-
-inference_to_gpu: True
+#============================================================
+# 추가 설명
+#============================================================
+# 본 config 파일은 Hydra를 통한 설정 로드 시, 모델 초기화, 데이터 로드, 학습, 추론 등에 필요한
+# 모든 설정 값을 담고 있습니다.
+# 필요 시 command line override를 통해 파라미터를 변경할 수 있습니다.
