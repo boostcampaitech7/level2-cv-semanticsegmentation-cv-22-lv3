@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+
 PALETTE = [
     (220, 20, 60), (119, 11, 32), (0, 0, 142), (0, 0, 230), (106, 0, 228),
     (0, 60, 100), (0, 80, 100), (0, 0, 70), (0, 0, 192), (250, 170, 30),
@@ -48,6 +49,7 @@ def visualize_predictions(pred, mask, image=None):
     pred_rgb = label2rgb_multi(pred)
     mask_rgb = label2rgb_multi(mask)
     
+    
     fp = (pred == 1) & (mask == 0)  
     fn = (pred == 0) & (mask == 1)  
 
@@ -62,6 +64,7 @@ def visualize_predictions(pred, mask, image=None):
     
     fp_mask = fp.any(axis=0)
     fn_mask = fn.any(axis=0)
+    
     
     overlay[fp_mask] = [1, 0, 0]  
     overlay[fn_mask] = [0, 0, 1]  

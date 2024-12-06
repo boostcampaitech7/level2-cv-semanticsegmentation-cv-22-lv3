@@ -43,8 +43,6 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
 
     images = sorted(images)
     labels = sorted(labels)
-
-
     return images, labels
 
 
@@ -64,13 +62,22 @@ def load_test_images(config):
 
 
     return images, test_data_path
+    return images, test_data_path
 
 
 class XRayDataset(Dataset):
     '''
         summary : XRay 이미지에 대한 사용자 커스텀 데이터 클래스
     '''
+    '''
+        summary : XRay 이미지에 대한 사용자 커스텀 데이터 클래스
+    '''
     def __init__ (self, mode='train', transforms=None, config=None):
+        '''
+            summary : 필요한 파라미터들을 정의
+            args : mode 설정, 증강기법, config 파일
+            retun : None
+        '''
         '''
             summary : 필요한 파라미터들을 정의
             args : mode 설정, 증강기법, config 파일
@@ -111,8 +118,15 @@ class XRayDataset(Dataset):
         self.weight_inside = config.loss_func.get('weight_inside', 1.0)
         self.weight_boundary = config.loss_func.get('weight_boundary', 2.0)
 
+        return None
+
 
     def load_test_images(self, config: Dict[str, Any]) -> Tuple[list, str]:
+        '''
+            summary : 테스트 데이터를 로드
+            args : config  파일
+            retun : 테스트 이미지, 데이트 데이터 경로
+        '''
         '''
             summary : 테스트 데이터를 로드
             args : config  파일
@@ -136,13 +150,11 @@ class XRayDataset(Dataset):
         '''
         mask = mask.astype(np.uint8)
         kernel = np.ones((3,3), np.uint8)
-        
 
         boundary = mask.copy()
         for _ in range(self.boundary_width):
             eroded = cv2.erode(boundary, kernel, iterations=1)
             boundary = boundary - eroded
-        
 
         weight_map = np.ones_like(mask, dtype=np.float32) * self.weight_inside
         weight_map[boundary == 1] = self.weight_boundary
@@ -155,9 +167,22 @@ class XRayDataset(Dataset):
             args : None
             retun : 이미지 길이
         '''
+        '''
+            summary : 이미지의 갯수를 반환
+            args : None
+            retun : 이미지 길이
+        '''
         return len(self.imagenames)
 
     def __getitem__(self, idx: int) -> tuple:
+        '''
+            summary : 원하는 인덱스에 접근 가능하도록 설정
+            args : 인덱스 값
+            retun : test인 경우 -> 선택된 이미지, 선택된 이미지 이름
+                    train 경우 :
+                        가중치 맵 사용 : 이미지, 이미지라벨, 가중치맵
+                        가중치 맵 사용X : 이미지, 이미지 라벨
+        '''
         '''
             summary : 원하는 인덱스에 접근 가능하도록 설정
             args : 인덱스 값
@@ -220,7 +245,7 @@ class XRayDataset(Dataset):
 
             weight_maps = []
             for c in range(label.shape[0]):
-                wm = self.create_weight_map(label[c].numpy())
+                wm = self._create_weight_map(label[c].numpy())
                 weight_maps.append(wm)
             weight_maps = np.stack(weight_maps) 
             weight_maps = torch.from_numpy(weight_maps).float() 
