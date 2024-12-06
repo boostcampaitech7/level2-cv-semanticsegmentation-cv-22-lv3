@@ -2,7 +2,6 @@ model:
   module: 'segmentation_models_pytorch'
   library: "smp"
   base_model: "Unet"
-  checkpoint: null
   architecture:
     encoder_name: "resnet34"
     # encoder_depth: 5  # [3, 5], default is 5
@@ -13,4 +12,3 @@ model:
     in_channels: 3
     classes: 29
     activation: null # “sigmoid”, “softmax”, “logsoftmax”, “tanh”, “identity”
-  # weights_dir: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/20241122_231208_Unet_timm-mobilenetv3_small_100_ckpt/Unet_best_model"  # 사용자 정의 가중치 경로 추가

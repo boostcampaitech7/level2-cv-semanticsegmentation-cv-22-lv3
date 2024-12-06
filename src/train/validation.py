@@ -3,8 +3,8 @@ import torch.nn.functional as F
 import wandb
 from omegaconf import OmegaConf
 from tqdm.auto import tqdm
-from metrics.metrics import dice_coef
-from Model.utils.model_output import get_model_output
+from Train.metrics.metrics import dice_coef
+from Model.utils.model_utils import get_model_output
 from src.Visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
