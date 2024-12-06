@@ -100,11 +100,7 @@ class ConfigManager:
         timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
         base_model = config.model.base_model
         
-        if self.encoder_config:
-            encoder_name = self.encoder_config.model.architecture.encoder_name
-            folder_name = f'{timestamp}_{base_model}_{encoder_name}'
-        else:
-            folder_name = f'{timestamp}_{base_model}'
+        folder_name = f'{timestamp}_{base_model}'
             
         save_dir = os.path.join(config.save.save_dir, folder_name)
         os.makedirs(save_dir, exist_ok=True)
