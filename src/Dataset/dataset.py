@@ -69,15 +69,7 @@ class XRayDataset(Dataset):
     '''
         summary : XRay 이미지에 대한 사용자 커스텀 데이터 클래스
     '''
-    '''
-        summary : XRay 이미지에 대한 사용자 커스텀 데이터 클래스
-    '''
     def __init__ (self, mode='train', transforms=None, config=None):
-        '''
-            summary : 필요한 파라미터들을 정의
-            args : mode 설정, 증강기법, config 파일
-            retun : None
-        '''
         '''
             summary : 필요한 파라미터들을 정의
             args : mode 설정, 증강기법, config 파일
@@ -127,11 +119,6 @@ class XRayDataset(Dataset):
             args : config  파일
             retun : 테스트 이미지, 데이트 데이터 경로
         '''
-        '''
-            summary : 테스트 데이터를 로드
-            args : config  파일
-            retun : 테스트 이미지, 데이트 데이터 경로
-        '''
         test_data_path = config.data.test_data_path
         images = sorted([
             os.path.relpath(os.path.join(root, fname), start=test_data_path)
@@ -144,9 +131,12 @@ class XRayDataset(Dataset):
 
     def create_weight_map(self, mask: np.ndarray) -> np.ndarray:
         '''
-            summary : 클래스별 가중치 맵 생성
-            args : mask 정보
-            retun : 클래스별 가중치 맵들
+            summary : 
+                클래스별 가중치 맵 생성합니다.
+            args : 
+                mask 정보
+            retun : 
+                클래스별 가중치 맵들
         '''
         mask = mask.astype(np.uint8)
         kernel = np.ones((3,3), np.uint8)
@@ -162,31 +152,16 @@ class XRayDataset(Dataset):
 
 
     def __len__(self) -> int:
-        '''
-            summary : 이미지의 갯수를 반환
-            args : None
-            retun : 이미지 길이
-        '''
-        '''
-            summary : 이미지의 갯수를 반환
-            args : None
-            retun : 이미지 길이
-        '''
         return len(self.imagenames)
 
     def __getitem__(self, idx: int) -> tuple:
         '''
-            summary : 원하는 인덱스에 접근 가능하도록 설정
-            args : 인덱스 값
-            retun : test인 경우 -> 선택된 이미지, 선택된 이미지 이름
-                    train 경우 :
-                        가중치 맵 사용 : 이미지, 이미지라벨, 가중치맵
-                        가중치 맵 사용X : 이미지, 이미지 라벨
-        '''
-        '''
-            summary : 원하는 인덱스에 접근 가능하도록 설정
-            args : 인덱스 값
-            retun : test인 경우 -> 선택된 이미지, 선택된 이미지 이름
+            summary : 
+                원하는 인덱스에 접근 가능하도록 설정
+            args : 
+                인덱스 값
+            retun : 
+                test인 경우 -> 선택된 이미지, 선택된 이미지 이름
                     train 경우 :
                         가중치 맵 사용 : 이미지, 이미지라벨, 가중치맵
                         가중치 맵 사용X : 이미지, 이미지 라벨
