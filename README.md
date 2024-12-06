@@ -1,6 +1,11 @@
 # 🚀 프로젝트 소개
-> **Bone Segmentation**을 통해 정확하게 뼈를 인식하여 의료 진단 및 치료 계획을 개발하는 데 목적을 두고 있습니다.
-
+> 뼈 분할(Bone Segmentation)은 의료 진단 및 치료 계획 수립에서 중요한 역할을 하며, 딥러닝 기술을 활용해 정확한 분할을 목표로 합니다.
+> 
+**주요 응용 분야**
+1. **질병 진단:** 골절, 변형 등 뼈 관련 문제를 정확히 파악해 적절한 치료 제공.
+2. **수술 계획:** 뼈 구조 분석으로 필요한 수술 방법과 재료 선정.
+3. **의료 장비 제작:** 인공 관절 및 임플란트 설계에 필요한 정보 제공.
+4. **의료 교육:** 병태 및 부상에 대한 이해와 수술 기술 연습에 활용.
 <br>
 
 # 📋 목차
@@ -21,11 +26,11 @@
 # 💁🏼‍♂️💁‍♀️ 멤버 소개
 | 이름       | 기여 내용 |
 |------------|-----------|
-| **김한별** | - 베이스라인 구축 및 증강 실험  |
-| **손지형** | - 베이스라인 구축 및 해상도 실험 |
-| **유지환** | - 베이스라인 구축 및 모델 실험  |
-| **정승민** | - 베이스라인 구축 및 가설 실험  |
-| **조현준** | - 베이스라인 구축 및 앙상블 실험  |
+| **김한별** | - baseline 훈련 과정 구현, 모델 및 증강 실험  |
+| **손지형** | - 베이스라인 구축 및 해상도, 데이터 증강 실험 |
+| **유지환** | - Hydra baseline 구축, 모델/증강/스케줄러 실험 진행, 데이터 EDA 진행 |
+| **정승민** | - 베이스라인 구축, 손등 관련 가설 실험 진행  |
+| **조현준** | - 베이스라인 추론 과정 구현, 결과 시각화 및 앙상블  |
 
 ---
 
@@ -114,13 +119,15 @@ pip install requirements.txt
 # 🚀 모델 학습 방법
 
 학습시 원하는 config 파일과 model, encoder 파일을 필요로 하며 추가로 Wandb 사용시 project_name 과 run_name을 필요로 합니다.
+학습 결과는 'runs/날짜_모델명' 폴더에 체크포인트, 해당 config 파일이 자동 생성됩니다.
 ```bash
 python train.py --config 'path/to/config' --model 'path/to/model' --encoder 'path/to/encoder' --project_name 'Name' --run_name 'Name'
 ```
 
 추론시 mode, config 파일과 ckpt 파일의 경로를 필요로 합니다.
+추론 결과는 results '폴더에 모델명_체크포인트명_날짜'로 자동 생성됩니다.
 ```bash
-python inference.py --mode 'gpu' --config 'path/to/config' --checkpoint 'path/to/ckpt'
+python inference.py --mode 'gpu' --config 'path/to/config'
 ```
 
 <br>
@@ -151,7 +158,5 @@ UNet
 
 
 # 📞 문의
-  •	이메일: taky0315@naver.com | sonji0988@gmail.com | 2002bigstar@gmail.com | aaiss0927@gamil.com | harwsare@yonsei.ac.kr <br>
-	•	GitHub Issues: [링크](https://github.com/chungSungMin) <br>
-	•	팀 노션 페이지: Notion 링크
+김한별 : 2002bigstar@gmail.com  <br> 손지형 : sonji0988@gmail.com  <br> 유지환 : harwsare@yonsei.ac.kr  <br> 정승민 : taky0315@naver.com  <br> 조현준 : aaiss0927@gamil.com   <br>
 
