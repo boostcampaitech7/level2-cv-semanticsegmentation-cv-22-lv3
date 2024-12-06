@@ -8,8 +8,7 @@ import datetime
 from omegaconf import OmegaConf
 from Utils.set_seed import set_seed
 from validation import validation
-from Model.utils.model_output import get_model_output
-from src.Model.utils.model_output import save_model
+from Model.utils.model_utils import get_model_output, save_model
 
 
 def train(model: torch.nn.Module, 
@@ -116,14 +115,14 @@ def train(model: torch.nn.Module,
             if (epoch + 1) % config.data.valid.interval == 0:
                 dice = validation(model, stage_valloader, config=config)  
 
-                save_model(model, file_name=f'epoch_{epoch+1}_model', config=config)
+                save_model(model, file_name=f'Stage{stage}_epoch_{epoch+1}_model', config=config)
                 print(f'Save epoch {epoch+1} model in {config.save.save_ckpt}')
 
                 if best_dice + delta <= dice:
                     print(f'Stage{stage} Best performance at epoch: {epoch + 1}, {best_dice:.4f} -> {dice:.4f}')
                     print(f'Stage{stage} Save best model in {config.save.save_ckpt}')
                     best_dice = dice
-                    save_model(model, file_name=f'{config.model.architecture.base_model}_best_model', config=config)
+                    save_model(model, file_name=f'{config.model.base_model}_best_model', config=config)
 
                 else:
                     epochs_no_improve += 1

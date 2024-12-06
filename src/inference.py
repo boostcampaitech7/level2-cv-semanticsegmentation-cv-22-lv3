@@ -3,10 +3,9 @@ import argparse
 from tqdm import tqdm
 import torch.nn.functional as F
 from omegaconf import OmegaConf
-from Model.model_loader import model_loader
-from Model.utils.load_model import load_model
+from Model.model import model_loader
+from Model.utils.model_utils import load_model, get_model_output
 from Dataset.dataloader import get_test_loader
-from Model.utils.model_output import get_model_output
 from Utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, save_to_csv, prepare_inference_environment
 
 
@@ -81,12 +80,10 @@ def main():
     parser = argparse.ArgumentParser(description='Test Semantic Segmentation Model')
     parser.add_argument('--mode', type=str, default='gpu', choices=['cpu', 'gpu'], help='Inference mode: "cpu" or "gpu"')
     parser.add_argument('--config', type=str, required=True, help='Path to the experiment config file')
-    parser.add_argument('--checkpoint', type=str, required=True, help='Path to the pretrained model pt file')
 
     args = parser.parse_args()
 
     config = OmegaConf.load(args.config)
-    config.inference.checkpoint_path = args.checkpoint
     config.inference.mode = args.mode
 
     output_path = do_inference(config)
