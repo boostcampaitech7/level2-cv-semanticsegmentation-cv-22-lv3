@@ -1,6 +1,4 @@
 import os
-import numpy as np
-from PIL import Image
 import pytz
 import torch
 import wandb
