@@ -1,10 +1,11 @@
 model:
-  library: "smp"
+  module: 'segmentation_models_pytorch'
+  library: 'smp'
+  base_model: 'MAnet'
   architecture:
-    base_model: "MAnet"
-    encoder_name: "resnet34"
+    encoder_name: 'resnet34'
     encoder_depth: 5  #[3, 5], default is 5
-    encoder_weights: "imagenet"
+    encoder_weights: 'imagenet'
     decoder_use_batchnorm: True # True, False, “inplace”
     decoder_channels: (256, 128, 64, 32, 16) # List of integers which specify in_channels parameter for convolutions used in decoder
     decoder_pab_channels: 64 # A number of channels for PAB module in decoder. Default is 64

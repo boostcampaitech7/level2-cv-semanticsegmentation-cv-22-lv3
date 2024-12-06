@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "resnet34"
-    encoder_weights: "imagenet"
+    encoder_name: 'resnet34'
+    encoder_weights: 'imagenet'

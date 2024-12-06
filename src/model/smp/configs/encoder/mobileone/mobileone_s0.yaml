@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "mobileone_s0"
-    encoder_weights: "imagenet"
+    encoder_name: 'mobileone_s0'
+    encoder_weights: 'imagenet'

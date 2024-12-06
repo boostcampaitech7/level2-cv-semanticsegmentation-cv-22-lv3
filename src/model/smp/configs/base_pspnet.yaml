@@ -1,9 +1,10 @@
 model:
-  library: "smp"
+  module: 'segmentation_models_pytorch'
+  library: 'smp'
+  base_model: 'PSPNet'
   architecture:
-    base_model: "PSPNet"
-    encoder_name: "resnet34"
-    encoder_weights: "imagenet"
+    encoder_name: 'resnet34'
+    encoder_weights: 'imagenet'
     encoder_depth: 3  #[3, 5], default is 5
     psp_out_channels: 512
     psp_use_batchnorm: True # True, False, inplace

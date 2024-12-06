@@ -1,7 +1,7 @@
 # 데이터 및 훈련 관련 설정
 data :
-  train_data_path : '../../data/train/DCM'
-  train_label_path : '../../data/train/outputs_json'
+  train_data_path : '../../data/test/DCM'
+  train_label_path : '../../data/test/outputs_json'
   test_data_path : '../../data/test/DCM'
 
 
@@ -14,13 +14,14 @@ data :
     'Triquetrum', 'Pisiform', 'Radius', 'Ulna',
 ]
 
+
   fold : 0
   split_method : GroupKFold
   splits : 5
 
 
   train : 
-    batch_size : 4
+    batch_size : 2
     shuffle : True
     num_workers : 8
     pin_memory : True
@@ -34,7 +35,7 @@ data :
     
 
   valid : 
-    batch_size : 4
+    batch_size : 2
     shuffle : False
     num_workers : 8
     pin_memory : True
@@ -45,7 +46,7 @@ data :
   
 
   test : 
-    batch_size : 4
+    batch_size : 2
     shuffle : False
     num_workers : 8
     pin_memory : True
@@ -56,8 +57,8 @@ data :
 inference:
   threshold: 0.5
   output_size: [2048, 2048] 
-  checkpoint_path: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints/lraspp_mobilenet/lraspp_mobilenet_v3_large_best_model.pt"  # .ckpt에서 .pt로 수정
-  output_dir: "/data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/results"
+  checkpoint_path: "../checkpoints/best_model.pt"  
+  output_dir: "../results"
   mode: 'gpu'
 
 
@@ -108,8 +109,10 @@ augmentation:
 
 
 loss_func: 
-  weight_map : None
-  name: CombinedWeightedLoss # BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss,  CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
+  weight_map : True
+  # loss_func: BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
+  #            CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
+  name: CombinedWeightedLoss
 
 loss_func_defaults:
   BCEWithLogitsLoss: {}
@@ -133,13 +136,10 @@ loss_func_defaults:
 
 
 optimizer: 
-  name: AdamW # Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
+  # optimizer: Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
+  name: AdamW
   params:
     lr: 1e-4
-    weight_decay: 1e-2
-    betas: [0.9, 0.999]
-    eps: 1e-08
-    amsgrad: false
 
 optimizer_defaults:
   Adam:
@@ -169,7 +169,9 @@ optimizer_defaults:
 
 
 scheduler:
-  name: CosineAnnealingLR   # CosineAnnealingLR, StepLR, ReduceLROnPlateau, ExponentialLR, MultiStepLR, CosineAnnealingWarmRestarts
+  # scheduler: CosineAnnealingLR, StepLR, ReduceLROnPlateau, 
+  #            ExponentialLR, MultiStepLR, CosineAnnealingWarmRestarts
+  name: CosineAnnealingLR
   params:
     T_max: 50
 
@@ -204,10 +206,10 @@ scheduler_defaults:
     last_epoch: -1    
 
 
-
 debug: True
 save:
-  save_config: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/configs
-  save_ckpt: /data/ephemeral/home/level2-cv-semanticsegmentation-cv-22-lv3/checkpoints
+  save_dir: ../runs
 
 seed: 42
+
+

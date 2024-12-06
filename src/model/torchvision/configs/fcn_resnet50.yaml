@@ -1,5 +1,7 @@
 model:
-  library: "torchvision"
+  module: 'torchvision.models.segmentation'
+  library: 'torchvision'
+  base_model: 'fcn_resnet50'
   architecture:
-    base_model: "fcn_resnet50"
-    pretrained: True
+    weights: 'FCN_ResNet50_Weights.DEFAULT'
+    progress: True

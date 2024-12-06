@@ -1,4 +1,4 @@
 model:
   architecture:
-    encoder_name: "dpn107"
-    encoder_weights: "imagenet+5k"
+    encoder_name: 'dpn107'
+    encoder_weights: 'imagenet+5k'
