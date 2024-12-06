@@ -7,7 +7,7 @@ import wandb
 import datetime
 from omegaconf import OmegaConf
 from Utils.set_seed import set_seed
-from validation import validation
+from .validation import validation
 from Model.utils.model_utils import get_model_output, save_model
 
 

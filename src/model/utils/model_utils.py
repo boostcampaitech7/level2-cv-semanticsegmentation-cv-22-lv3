@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 from omegaconf import OmegaConf
 import segmentation_models_pytorch as smp
-from src.Utils.config_utils import ConfigManager
+from Utils.config_utils import ConfigManager
 
 def get_model_output(model: torch.nn.Module, input: torch.Tensor) -> torch.Tensor:
     '''

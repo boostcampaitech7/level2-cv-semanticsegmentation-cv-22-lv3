@@ -3,7 +3,7 @@ from omegaconf import OmegaConf
 from typing import Dict, Any, Tuple
 from torch.utils.data import DataLoader
 from Dataset.dataset import XRayDataset
-from src.Dataset.utils.transform import get_transforms
+from Dataset.utils.transform import get_transforms
 
 
 def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:

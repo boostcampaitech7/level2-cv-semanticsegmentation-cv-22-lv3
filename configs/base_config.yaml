@@ -1,8 +1,8 @@
 # 데이터 및 훈련 관련 설정
 data :
-  train_data_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/DCM'
-  train_label_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/outputs_json'
-  test_data_path : '/Users/jeongseungmin/Desktop/Study/datacentric/Data/test/DCM'
+  train_data_path : '../../data/test/DCM'
+  train_label_path : '../../data/test/outputs_json'
+  test_data_path : '../../data/test/DCM'
 
 
   classes : [
@@ -208,8 +208,7 @@ scheduler_defaults:
 
 debug: True
 save:
-  save_config: ../configs
-  save_ckpt: ../checkpoints
+  save_dir: ../runs
 
 seed: 42
 

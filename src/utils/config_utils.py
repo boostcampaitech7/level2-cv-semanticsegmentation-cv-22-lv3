@@ -18,7 +18,7 @@ class ConfigManager:
         '''
         self.base_config = OmegaConf.load(base_config)
         self.model_config = OmegaConf.load(model_config)
-        self.encoder_config = OmegaConf.load(encoder_config) if encoder_config else None
+        self.encoder_config = OmegaConf.load(encoder_config) if encoder_config else {}
         self.save_dir = self.base_config.save.save_dir
 
 

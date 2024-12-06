@@ -5,8 +5,8 @@ from Utils.set_seed import set_seed
 from Utils.config_utils import ConfigManager
 from Model.model import model_loader
 from Dataset.dataloader import get_train_val_loader
-from src.Train.trainer import train
-from src.Train.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
+from Train.trainer import train
+from Train.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 
 
 def do_train(cfg: OmegaConf, project_name: str, run_name: str) -> None:
@@ -58,9 +58,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Semantic Segmentation Model')
     parser.add_argument('--config', type=str, default='../configs/base_config.yaml', 
                         help='Path to the config file for train')
-    parser.add_argument('--model', type=str, default='../configs/fcn_resnet50.yaml', 
+    parser.add_argument('--model', type=str, default='./Model/torchvision/configs/fcn_resnet50.yaml', 
                         help='Path to the model config file')
-    parser.add_argument('--encoder', type=str, default=None, 
+    parser.add_argument('--encoder', type=str, default={}, 
                         help='Path to the encoder config file')
     parser.add_argument('--project_name', type = str, default='이름 미지정 프로젝트',
                         help='Write a wandb project name')
