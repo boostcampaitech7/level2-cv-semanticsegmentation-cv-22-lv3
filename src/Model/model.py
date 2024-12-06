@@ -1,4 +1,3 @@
-import torch
 import importlib
 from Model.utils.model_utils import update_last_layer
 
