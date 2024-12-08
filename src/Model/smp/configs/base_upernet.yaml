@@ -1,0 +1,13 @@
+model:
+  module: 'segmentation_models_pytorch'
+  library: "smp"
+  base_model: "UPerNet"
+  architecture:
+    encoder_name: "resnet34"
+    encoder_depth: 5  # [3, 5], default is 5
+    encoder_weights: "imagenet"
+    decoder_pyramid_channels: 256 # A number of convolution filters in Feature Pyramid, default is 256
+    decoder_segmentation_channels: 64 # A number of convolution filters in segmentation blocks, default is 64
+    in_channels: 3
+    classes: 29
+    activation: null # “sigmoid”, “softmax”, “logsoftmax”, “tanh”, “identity”
