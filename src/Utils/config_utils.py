@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import pytz
 from datetime import datetime
 from omegaconf import OmegaConf
@@ -20,7 +21,6 @@ class ConfigManager:
         self.model_config = OmegaConf.load(model_config)
         self.encoder_config = OmegaConf.load(encoder_config) if encoder_config else {}
         self.save_dir = self.base_config.save.save_dir
-
 
     def load_config(self) -> OmegaConf:
         '''
@@ -70,7 +70,6 @@ class ConfigManager:
 
         return None
 
-
     def _merge_config(self, *configs : OmegaConf) -> OmegaConf:
         '''
         summary :
@@ -83,7 +82,6 @@ class ConfigManager:
             병합된 config 객체
         '''
         return OmegaConf.merge(*configs)
-
 
     def _create_run_directory(self, config: OmegaConf) -> str:
         '''
@@ -102,11 +100,10 @@ class ConfigManager:
         
         folder_name = f'{timestamp}_{base_model}'
             
-        save_dir = os.path.join(config.save.save_dir, folder_name)
+        save_dir = osp.join(config.save.save_dir, folder_name)
         os.makedirs(save_dir, exist_ok=True)
         
         return save_dir
-    
     
     @staticmethod
     def _save_config(config : OmegaConf, run_dir: str) -> None:
@@ -123,12 +120,11 @@ class ConfigManager:
         '''
         base_model = config.model.base_model
         file_name = f'{base_model}_config.yaml'
-        cfg_dir = os.path.join(run_dir, file_name)
+        cfg_dir = osp.join(run_dir, file_name)
         OmegaConf.save(config, cfg_dir)
         print(f'설정 파일이 {cfg_dir}에 저장되었습니다.')
 
         return None
-
 
     def _save_ckpt(self, config : OmegaConf, run_dir : str) -> None:
         '''
@@ -142,14 +138,13 @@ class ConfigManager:
         return :
             반환값이 없습니다.
         '''
-        ckpt_dir = os.path.join(run_dir, 'checkpoint')
+        ckpt_dir = osp.join(run_dir, 'checkpoint')
         os.makedirs(ckpt_dir, exist_ok=True)
         config.save.save_ckpt = ckpt_dir
         print(f'체크포인트 저장 디렉토리가 {ckpt_dir}에 생성되었습니다')
 
         return None
     
-
     def _save_output(self, config : OmegaConf, run_dir : str) -> None:
         '''
         summary:
@@ -162,7 +157,7 @@ class ConfigManager:
         return :
             반환값이 없습니다.
         '''
-        output_dir = os.path.join(run_dir, 'output')
+        output_dir = osp.join(run_dir, 'output')
         os.makedirs(output_dir, exist_ok=True)
         config.save.output_dir = output_dir
         print(f'output 저장 디렉토리가 {output_dir}에 생성되었습니다.')

@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'mit_b5'
-    encoder_weights: 'imagenet'

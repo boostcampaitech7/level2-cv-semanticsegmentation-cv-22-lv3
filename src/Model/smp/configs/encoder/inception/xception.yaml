@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'xception'
-    encoder_weights: 'imagenet'

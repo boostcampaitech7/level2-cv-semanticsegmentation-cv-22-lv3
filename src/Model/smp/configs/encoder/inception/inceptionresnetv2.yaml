@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'inceptionresnetv2'
-    encoder_weights: 'imagenet'
