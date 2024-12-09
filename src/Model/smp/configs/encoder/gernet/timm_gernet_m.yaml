@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'timm-gernet_m'
-    encoder_weights: 'imagenet'

@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import numpy as np
 import pandas as pd
 import argparse
@@ -6,7 +7,7 @@ from datetime import datetime
 import pytz
 from tqdm import tqdm
 import torch
-from Utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, decode_rle_to_mask, decode_rle_to_mask_gpu
+from utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, decode_rle_to_mask, decode_rle_to_mask_gpu
 
 
 def validate_csv_files(dataframes : pd.DataFrame) -> bool:
@@ -109,10 +110,10 @@ def save_ensemble_result(df : pd.DataFrame, base_dir : str) -> str:
     kst = pytz.timezone('Asia/Seoul')
     timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
 
-    output_folder = os.path.join(base_dir, 'results')
+    output_folder = osp.join(base_dir, 'results')
     os.makedirs(output_folder, exist_ok=True)
     
-    output_filepath = os.path.join(output_folder, f'{timestamp}_hard_voting_ensembled.csv')
+    output_filepath = osp.join(output_folder, f'{timestamp}_hard_voting_ensembled.csv')
     df.to_csv(output_filepath, index=False)
     
     return output_filepath
@@ -133,7 +134,7 @@ def main():
     dataframes = [pd.read_csv(csv_file) for csv_file in args.csvs]
     validate_csv_files(dataframes)
     final_df = perform_ensemble(dataframes, args.mode)
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_dir = osp.dirname(osp.dirname(osp.abspath(__file__)))
     output_filepath = save_ensemble_result(final_df, base_dir)
     
     print(f'Results saved to: {output_filepath}')

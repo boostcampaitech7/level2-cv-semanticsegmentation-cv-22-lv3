@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'resnet50'
-    encoder_weights: 'imagenet'

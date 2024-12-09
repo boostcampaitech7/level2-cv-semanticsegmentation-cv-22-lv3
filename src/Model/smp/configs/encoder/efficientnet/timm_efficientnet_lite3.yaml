@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'timm-efficientnet-lite3L'
-    encoder_weights: 'imagenet'

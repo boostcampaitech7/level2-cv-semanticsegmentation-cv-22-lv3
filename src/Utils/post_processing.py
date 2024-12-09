@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import pytz
 import argparse
 import pandas as pd
@@ -33,12 +34,12 @@ if __name__ == '__main__':
     kst = pytz.timezone('Asia/Seoul')
     timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
 
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    output_folder = os.path.join(base_dir, 'results')
+    base_dir = osp.dirname(osp.dirname(osp.abspath(__file__)))
+    output_folder = osp.join(base_dir, 'results')
     os.makedirs(output_folder, exist_ok=True)
     
-    original_filename = os.path.splitext(os.path.basename(args.csv))[0]
-    output_filepath = os.path.join(output_folder, f'{timestamp}_{original_filename}_postprocessed.csv')
+    original_filename = osp.splitext(osp.basename(args.csv))[0]
+    output_filepath = osp.join(output_folder, f'{timestamp}_{original_filename}_postprocessed.csv')
 
     processed_df.to_csv(output_filepath, index=False)
     print(f'Post-processed submission saved to: {output_filepath}')

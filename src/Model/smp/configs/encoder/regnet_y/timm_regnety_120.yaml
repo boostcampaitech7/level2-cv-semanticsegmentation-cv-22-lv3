@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'timm-regnety_120'
-    encoder_weights: 'imagenet'

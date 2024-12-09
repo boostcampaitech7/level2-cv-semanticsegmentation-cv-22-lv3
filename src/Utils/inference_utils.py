@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import cv2
 import numpy as np
 import pandas as pd
@@ -6,7 +7,6 @@ import pytz
 from datetime import datetime
 import torch
 from omegaconf import OmegaConf
-import segmentation_models_pytorch as smp
 from set_seed import set_seed
 
 
@@ -175,10 +175,10 @@ def save_to_csv(filename_and_class : list, rles : list, cfg : OmegaConf):
     kst = pytz.timezone('Asia/Seoul')
     timestamp = datetime.now(kst).strftime('%Y%m%d_%H%M%S')
     pt_name = cfg.inference.checkpoint_path.split('/')[-1].split('.')[0]
-    output_filepath = os.path.join(cfg.inference.output_dir, f'{pt_name}_{timestamp}.csv')
+    output_filepath = osp.join(cfg.inference.output_dir, f'{pt_name}_{timestamp}.csv')
 
     classes, filename = zip(*[x.split('_') for x in filename_and_class])
-    image_name = [os.path.basename(f) for f in filename]
+    image_name = [osp.basename(f) for f in filename]
 
     df = pd.DataFrame({
         'image_name': image_name,

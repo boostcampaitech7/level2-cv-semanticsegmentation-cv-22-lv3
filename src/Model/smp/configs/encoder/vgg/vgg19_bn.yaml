@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'vgg19_bn'
-    encoder_weights: 'imagenet'

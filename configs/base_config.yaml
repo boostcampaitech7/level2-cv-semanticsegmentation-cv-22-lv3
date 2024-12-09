@@ -4,7 +4,6 @@ data :
   train_label_path : '../../data/test/outputs_json'
   test_data_path : '../../data/test/DCM'
 
-
   classes : [
     'finger-1', 'finger-2', 'finger-3', 'finger-4', 'finger-5',
     'finger-6', 'finger-7', 'finger-8', 'finger-9', 'finger-10',
@@ -12,13 +11,11 @@ data :
     'finger-16', 'finger-17', 'finger-18', 'finger-19', 'Trapezium',
     'Trapezoid', 'Capitate', 'Hamate', 'Scaphoid', 'Lunate',
     'Triquetrum', 'Pisiform', 'Radius', 'Ulna',
-]
-
+    ]
 
   fold : 0
   split_method : GroupKFold
   splits : 5
-
 
   train : 
     batch_size : 2
@@ -33,7 +30,6 @@ data :
     max_epoch : 100
     decline_score : 0.3
     
-
   valid : 
     batch_size : 2
     shuffle : False
@@ -44,15 +40,12 @@ data :
     threshold: 0.5
     check: True
   
-
   test : 
     batch_size : 2
     shuffle : False
     num_workers : 8
     pin_memory : True
     drop_last : False
-
-
 
 inference:
   threshold: 0.5
@@ -61,15 +54,12 @@ inference:
   output_dir: "../results"
   mode: 'gpu'
 
-
-
 interpolate:
     nearest: 'nearest'
     bilinear: 'bilinear'
     bicubic: 'bicubic'
     area: 'area'
     lanczos: 'lanczos'
-  
 
 augmentation:
   train:
@@ -107,7 +97,6 @@ augmentation:
         mean: [0.485, 0.456, 0.406]
         std: [0.229, 0.224, 0.225]
 
-
 loss_func: 
   weight_map : True
   # loss_func: BCEWithLogitsLoss, DiceLoss, JaccardLoss, FocalLoss, 
@@ -132,8 +121,6 @@ loss_func_defaults:
     Tn: 1.0
   BCEDiceLoss:
     dice_mode: multilabel
-
-
 
 optimizer: 
   # optimizer: Adam, SGD, AdamW, RMSprop, Adagrad, Adadelta
@@ -166,7 +153,6 @@ optimizer_defaults:
     rho: 0.9          
     eps: 1e-6
     weight_decay: 0   
-
 
 scheduler:
   # scheduler: CosineAnnealingLR, StepLR, ReduceLROnPlateau, 
@@ -205,11 +191,8 @@ scheduler_defaults:
     eta_min: 0       
     last_epoch: -1    
 
-
 debug: True
 save:
   save_dir: ../runs
 
 seed: 42
-
-
