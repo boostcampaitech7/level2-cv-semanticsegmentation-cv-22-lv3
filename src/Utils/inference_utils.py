@@ -15,7 +15,7 @@ def prepare_inference_environment(config: DictConfig) -> tuple:
     summary:
         추론을 위한 환경을 준비하는 함수로, 시드 설정, 클래스 매핑, 디바이스 설정을 수행합니다.
 
-    args : 
+    args: 
         config: 학습 및 모델 설정 객체.
 
     return:
