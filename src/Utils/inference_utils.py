@@ -7,7 +7,7 @@ import pytz
 from datetime import datetime
 import torch
 from omegaconf import OmegaConf
-from set_seed import set_seed
+from data.dataloader import set_seed
 
 
 def prepare_inference_environment(configs : list) -> tuple:

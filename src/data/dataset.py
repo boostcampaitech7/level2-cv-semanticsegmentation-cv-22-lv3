@@ -4,12 +4,13 @@ import cv2
 import json
 import torch
 import numpy as np
-from typing import Dict, Any, Tuple
+from omegaconf import DictConfig
+from typing import Tuple
 from torch.utils.data import Dataset
 from data.utils.splitdata import split_data
 
 
-def check_image_label_pair(config) -> tuple[list[str], list[str]]:
+def check_image_label_pair(config: DictConfig) -> tuple[list[str], list[str]]:
     '''
         summary : 
             이미지이름과 라벨이름이 동일하고 갯수가 맞는지 확인한다
@@ -46,7 +47,7 @@ def check_image_label_pair(config) -> tuple[list[str], list[str]]:
     return images, labels
 
 
-def load_test_images(config):
+def load_test_images(config: DictConfig):
     '''
         summary : 테스트 데이터를 로드한다
         args : config 파일
@@ -112,7 +113,7 @@ class XRayDataset(Dataset):
         return None
 
 
-    def load_test_images(self, config: Dict[str, Any]) -> Tuple[list, str]:
+    def load_test_images(self, config: DictConfig) -> Tuple[list, str]:
         '''
             summary : 테스트 데이터를 로드
             args : config  파일

@@ -1,7 +1,9 @@
+from omegaconf import DictConfig
 from sklearn.model_selection import GroupKFold, KFold
 
 
-def split_data(_imagenames: list, _labelnames: list, groups: list, config: dict, mode: str = 'train', split_method: str = 'GroupKFold') -> tuple[list, list]:
+def split_data(_imagenames: list, _labelnames: list, groups: list, config: DictConfig, 
+               mode: str = 'train', split_method: str = 'GroupKFold') -> tuple[list, list]:
     '''
         summary : 
             split_method에 맞는 방식으로 Train/Val을 n_split 갯수만큼 분할합니다.
