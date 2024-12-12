@@ -3,8 +3,8 @@ import pytz
 import torch
 import wandb
 import datetime
-from omegaconf import OmegaConf
-from utils.set_seed import set_seed
+from omegaconf import DictConfig
+from data.dataloader import set_seed
 from .validation import validation
 from models.utils.models_utils import get_model_output, save_model
 
@@ -15,7 +15,7 @@ def train(model: torch.nn.Module,
           criterion: torch.nn.Module, 
           optimizer: torch.optim.Optimizer, 
           scheduler: torch.optim.lr_scheduler._LRScheduler, 
-          config: OmegaConf) -> None:
+          config: DictConfig) -> None:
     '''
     summary:
         두 단계 학습 방식으로 모델 학습을 수행하는 함수입니다. 
@@ -29,7 +29,7 @@ def train(model: torch.nn.Module,
         criterion (torch.nn.Module): 손실 함수.
         optimizer (torch.optim.Optimizer): 옵티마이저.
         scheduler (torch.optim.lr_scheduler._LRScheduler): 학습률 스케줄러.
-        config (OmegaConf): 학습 및 모델 설정 객체.
+        config (DictConfig): 학습 및 모델 설정 객체.
 
     return:
         None: 이 함수는 값을 반환하지 않습니다.

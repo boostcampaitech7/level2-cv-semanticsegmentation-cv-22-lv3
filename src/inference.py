@@ -2,14 +2,14 @@ import torch
 import argparse
 from tqdm import tqdm
 import torch.nn.functional as F
-from omegaconf import OmegaConf
-from models import model_loader
+from omegaconf import OmegaConf, DictConfig
+from models.model import model_loader
 from models.utils.models_utils import load_model, get_model_output
-from data.dataloader import get_test_loader
+from data.dataloader import get_test_loader, set_seed
 from utils.inference_utils import encode_mask_to_rle, encode_mask_to_rle_gpu, save_to_csv, prepare_inference_environment
 
 
-def do_inference(config : OmegaConf) -> str:
+def do_inference(config : DictConfig) -> str:
     '''
     단일 모델을 사용하여 시맨틱 세그멘테이션 추론을 수행합니다.
 

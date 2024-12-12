@@ -1,10 +1,14 @@
-from typing import Dict, Any, Tuple
+import torch
+import random
+import numpy as np
+from typing import Tuple
+from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from data.dataset import XRayDataset
 from data.utils.transform import get_transforms
 
 
-def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoader]:
+def get_train_val_loader(config: DictConfig) -> Tuple[DataLoader, DataLoader]:
     '''
         summary : 
             데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 train_laoder와 val_loader를 생성합니다.
@@ -43,7 +47,7 @@ def get_train_val_loader(config : Dict[str, Any]) -> Tuple[DataLoader, DataLoade
     return train_loader, val_loader
 
 
-def get_test_loader(config : Dict[str, Any]) -> DataLoader : 
+def get_test_loader(config: DictConfig) -> DataLoader : 
     '''
         summary : 
             데이터셋을 커스텀 데이터셋과 데이터 로더를 활용하여 커스텀된 test_loader를 생성합니다.
@@ -69,3 +73,23 @@ def get_test_loader(config : Dict[str, Any]) -> DataLoader :
 
     return test_loader
 
+
+def set_seed(seed: int) -> None:
+    '''
+    summary :
+        재현성을 위해 모든 랜덤 시드를 고정합니다. 
+        PyTorch, CUDA, NumPy, Python의 랜덤 생성기를 초기화합니다.
+
+    args : 
+        seed : 고정할 랜덤 시드 값
+
+    '''
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) 
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(seed)
+    random.seed(seed)
+
+    return None

@@ -1,8 +1,9 @@
 import importlib
+from omegaconf import DictConfig
 from models.utils.models_utils import update_last_layer
 
 
-def model_loader(config):
+def model_loader(config: DictConfig):
     '''
         summary : 
             설정(config)에 따라 모델을 로드합니다.

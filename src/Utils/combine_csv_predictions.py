@@ -2,7 +2,8 @@ import pandas as pd
 import argparse
 
 
-def merge_and_replace_rle(csv1_path: str, csv2_path: str, output_path: str, classes: list) -> None:
+def merge_and_replace_rle(csv1_path: str, csv2_path: str, 
+                          output_path: str, classes: list) -> None:
     '''
     summary :
         두 개의 CSV 파일을 병합하고, 특정 클래스의 RLE 값을 지정된 CSV 파일에 덮어씌웁니다.
@@ -33,15 +34,15 @@ def merge_and_replace_rle(csv1_path: str, csv2_path: str, output_path: str, clas
         )
     
     for num in range(2):
-        file_1, file_2 = csv1, csv2
+        csv_1, csv_2 = csv1, csv2
         if num == 1:
-            file_1, file_2 = csv2, csv1
-        if file_1['rle'].isna().any(): 
-            image_name = file_1[file_1['rle'].isna()]['image_name']
-            cls_name = file_1[file_1['rle'].isna()]['class']
+            csv_1, csv_2 = csv2, csv1
+        if csv_1['rle'].isna().any(): 
+            image_name = csv_1[csv_1['rle'].isna()]['image_name']
+            cls_name = csv_1[csv_1['rle'].isna()]['class']
             for i, j in zip(image_name, cls_name): 
-                rle = list(file_2[(file_2['image_name']==i) & (file_2['class']==j)]['rle'])
-                file_1.loc[(file_1['image_name'] == i) & (file_1['class'] == j), 'rle'] = rle
+                rle = list(csv_2[(csv_2['image_name']==i) & (csv_2['class']==j)]['rle'])
+                csv_1.loc[(csv_1['image_name'] == i) & (csv_1['class'] == j), 'rle'] = rle
 
 
     csv2_radius = csv2[csv2['class'].isin(classes)]

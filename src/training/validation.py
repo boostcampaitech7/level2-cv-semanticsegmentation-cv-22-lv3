@@ -1,16 +1,16 @@
 import torch
 import torch.nn.functional as F
 import wandb
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 from tqdm.auto import tqdm
-from Train.metrics.metrics import dice_coef
+from training.metrics.metrics import dice_coef
 from models.utils.models_utils import get_model_output
 from visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
 def validation(model: torch.nn.Module, 
                data_loader: torch.utils.data.DataLoader, 
-               config: OmegaConf = None) -> float:
+               config: DictConfig = None) -> float:
     '''
     summary:
         모델 검증을 수행하여 평균 Dice 계수를 계산하고, 시각화를 저장하며, 

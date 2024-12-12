@@ -1,8 +1,8 @@
 # 데이터 및 훈련 관련 설정
 data :
-  train_data_path : '../../data/test/DCM'
-  train_label_path : '../../data/test/outputs_json'
-  test_data_path : '../../data/test/DCM'
+  train_data_path : '/data/ephemeral/home/data/train_data'
+  train_label_path : '/data/ephemeral/home/data/train_label'
+  test_data_path : '/data/ephemeral/home/data/test_data'
 
   classes : [
     'finger-1', 'finger-2', 'finger-3', 'finger-4', 'finger-5',
@@ -50,8 +50,8 @@ data :
 inference:
   threshold: 0.5
   output_size: [2048, 2048] 
-  checkpoint_path: "../checkpoints/best_model.pt"  
-  output_dir: "../results"
+  checkpoint_path: "/data/ephemeral/home/checkpoints/best_model.pt"  
+  output_dir: "/data/ephemeral/home/results"
   mode: 'gpu'
 
 interpolate:
@@ -193,6 +193,6 @@ scheduler_defaults:
 
 debug: True
 save:
-  save_dir: ../runs
+  save_dir: /data/ephemeral/home/runs
 
 seed: 42

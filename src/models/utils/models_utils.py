@@ -1,7 +1,7 @@
 import os.path as osp
 import torch
 import torch.nn as nn
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 import segmentation_models_pytorch as smp
 from src.utils.config_utils import ConfigManager
 
@@ -25,7 +25,7 @@ def get_model_output(model: torch.nn.Module, input: torch.Tensor) -> torch.Tenso
 
 def save_model(model: torch.nn.Module, 
                file_name: str='fcn_resnet50_best_model', 
-               config: OmegaConf=None) -> None:
+               config: DictConfig=None) -> None:
     '''
     summary:
         주어진 모델을 지정된 파일 이름과 경로에 저장합니다. 
@@ -34,7 +34,7 @@ def save_model(model: torch.nn.Module,
     args:
         model (torch.nn.Module): 저장할 모델 객체.
         file_name (str): 저장될 파일 이름. 기본값은 'fcn_resnet50_best_model'.
-        config (OmegaConf): 모델 저장 설정을 포함하는 구성 객체.
+        config (DictConfig): 모델 저장 설정을 포함하는 구성 객체.
     
     return:
         반환값이 없습니다.

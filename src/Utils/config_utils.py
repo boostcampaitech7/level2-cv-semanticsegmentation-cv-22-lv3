@@ -6,7 +6,8 @@ from omegaconf import OmegaConf
 
 
 class ConfigManager:
-    def __init__(self, base_config : str, model_config : str, encoder_config : str = None) -> None:
+    def __init__(self, base_config : str, model_config : str, 
+                 encoder_config : str = None) -> None:
         '''
         summary :
             여러 구성 파일을 로드하고 병합하기 위한 ConfigManager 클래스를 초기화합니다.
@@ -70,7 +71,7 @@ class ConfigManager:
 
         return None
 
-    def _merge_config(self, *configs : OmegaConf) -> OmegaConf:
+    def _merge_config(self, *configs: OmegaConf) -> OmegaConf:
         '''
         summary :
             여러 구성 객체를 병합합니다.

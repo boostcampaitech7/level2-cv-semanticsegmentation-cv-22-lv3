@@ -1,22 +1,21 @@
 import wandb
 import argparse
-from omegaconf import OmegaConf
-from utils.set_seed import set_seed
+from omegaconf import OmegaConf, DictConfig
 from utils.config_utils import ConfigManager
 from models.model import model_loader
-from data.dataloader import get_train_val_loader
-from Train.trainer import train
-from Train.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
+from data.dataloader import get_train_val_loader, set_seed
+from training.trainer import train
+from training.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 
 
-def do_train(cfg: OmegaConf, project_name: str, run_name: str) -> None:
+def do_train(config: DictConfig, project_name: str, run_name: str) -> None:
     '''
-    summary: `cfg`에 제공된 설정을 사용해 모델을 학습하고, 
+    summary: `config`에 제공된 설정을 사용해 모델을 학습하고, 
               Weights and Biases(wandb)에 학습 관련 지표를 기록하며, 
               모델을 평가하는 함수입니다.
 
     args: 
-        cfg (OmegaConf): 모델, 데이터, 학습 파라미터를 포함한 설정 객체.
+        config (DictConfig): 모델, 데이터, 학습 파라미터를 포함한 설정 객체.
         project_name (str): wandb 프로젝트 이름.
         run_name (str): wandb에서 특정 학습 실행을 식별하기 위한 고유 이름.
     
@@ -24,27 +23,27 @@ def do_train(cfg: OmegaConf, project_name: str, run_name: str) -> None:
         None: 이 함수는 값을 반환하지 않습니다.
     '''
 
-    if cfg.debug:
-        cfg.data.train.max_epoch = 2
-        cfg.data.train.print_step = 1
-        cfg.data.valid.interval = 1
+    if config.debug:
+        config.data.train.max_epoch = 2
+        config.data.train.print_step = 1
+        config.data.valid.interval = 1
 
-    model = model_loader(cfg)
-    criterion = loss_func_loader(cfg)
-    optimizer = optimizer_loader(cfg, model.parameters())
+    model = model_loader(config)
+    criterion = loss_func_loader(config)
+    optimizer = optimizer_loader(config, model.parameters())
 
     wandb.init(
         project=project_name,  
         name=run_name,         
-        config=OmegaConf.to_container(cfg, resolve=True),
+        config=OmegaConf.to_container(config, resolve=True),
         reinit=True
     )
     wandb.watch(model, log = 'all')
 
-    set_seed(cfg.seed)
-    train_loader, val_loader = get_train_val_loader(cfg)
-    scheduler = lr_scheduler_loader(cfg, optimizer)
-    train(model, train_loader, val_loader, criterion, optimizer, scheduler, cfg)
+    set_seed(config.seed)
+    train_loader, val_loader = get_train_val_loader(config)
+    scheduler = lr_scheduler_loader(config, optimizer)
+    train(model, train_loader, val_loader, criterion, optimizer, scheduler, config)
 
     wandb.finish()
 
@@ -56,9 +55,9 @@ def do_train(cfg: OmegaConf, project_name: str, run_name: str) -> None:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train Semantic Segmentation Model')
-    parser.add_argument('--config', type=str, default='../configs/base_config.yaml', 
+    parser.add_argument('--config', type=str, default='/data/ephemeral/home/configs/base_config.yaml', 
                         help='Path to the config file for train')
-    parser.add_argument('--model', type=str, default='./Model/torchvision/configs/fcn_resnet50.yaml', 
+    parser.add_argument('--model', type=str, default='/data/ephemeral/home/src/models/torchvision/configs/fcn_resnet50.yaml', 
                         help='Path to the model config file')
     parser.add_argument('--encoder', type=str, default={}, 
                         help='Path to the encoder config file')

@@ -2,18 +2,18 @@ from typing import Generator
 import torch.nn as nn
 import torch.optim as optim
 import segmentation_models_pytorch as smp
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 from .custom_loss import CombinedWeightedLoss, TwoWayLoss, BCEDiceLoss
 
 
-def loss_func_loader(config: OmegaConf) -> nn.Module:
+def loss_func_loader(config: DictConfig) -> nn.Module:
     '''
     summary:
         주어진 설정(config)을 기반으로 손실 함수(loss function)를 로드하여 반환합니다. 
         지원되지 않는 손실 함수 요청 시 예외를 발생시킵니다.
 
     args:
-        config (OmegaConf): 손실 함수 이름과 매개변수를 포함하는 설정 객체.
+        config (DictConfig): 손실 함수 이름과 매개변수를 포함하는 설정 객체.
 
     return:
         nn.Module: 구성된 손실 함수 모듈 객체.
@@ -60,14 +60,16 @@ def loss_func_loader(config: OmegaConf) -> nn.Module:
         raise ValueError(f'Unsupported loss_func: {loss_func_name}')
 
 
-def optimizer_loader(config: OmegaConf, model_parameters: Generator) -> optim.Optimizer:
+def optimizer_loader(config: DictConfig, 
+                     model_parameters: Generator) -> optim.Optimizer:
     '''
     summary:
-        주어진 설정(config)과 모델의 파라미터를 기반으로 최적화 알고리즘(optimizer)을 로드하여 반환합니다.
+        주어진 설정(config)과 모델의 파라미터를 기반으로 
+        최적화 알고리즘(optimizer)을 로드하여 반환합니다.
         지원되지 않는 옵티마이저 요청 시 예외를 발생시킵니다.
 
     args:
-        config (OmegaConf): 옵티마이저 이름과 매개변수를 포함하는 설정 객체.
+        config (DictConfig): 옵티마이저 이름과 매개변수를 포함하는 설정 객체.
         model_parameters (Generator): 모델의 학습 가능한 파라미터.
 
     return:
@@ -105,7 +107,7 @@ def optimizer_loader(config: OmegaConf, model_parameters: Generator) -> optim.Op
         raise ValueError(f'Unsupported optimizer: {optimizer_name}')
     
 
-def lr_scheduler_loader(config: OmegaConf, 
+def lr_scheduler_loader(config: DictConfig, 
                         optimizer: optim.Optimizer) -> optim.lr_scheduler._LRScheduler:
     '''
     summary:
@@ -114,7 +116,7 @@ def lr_scheduler_loader(config: OmegaConf,
         지원되지 않는 스케줄러 요청 시 예외를 발생시킵니다.
 
     args:
-        config (OmegaConf): 스케줄러 이름과 매개변수를 포함하는 설정 객체.
+        config (DictConfig): 스케줄러 이름과 매개변수를 포함하는 설정 객체.
         optimizer (optim.Optimizer): 학습률 스케줄러가 적용될 옵티마이저.
 
     return:
