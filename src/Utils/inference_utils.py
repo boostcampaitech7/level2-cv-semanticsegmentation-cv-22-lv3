@@ -10,7 +10,7 @@ import segmentation_models_pytorch as smp
 from set_seed import set_seed
 
 
-def prepare_inference_environment(config : OmegaConf) -> tuple:
+def prepare_inference_environment(config: OmegaConf) -> tuple:
     '''
     summary :
         추론을 위한 환경을 준비하는 함수로, 시드 설정, 클래스 매핑, 디바이스 설정을 수행합니다.
