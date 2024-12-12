@@ -10,23 +10,23 @@ import segmentation_models_pytorch as smp
 from set_seed import set_seed
 
 
-def prepare_inference_environment(configs : list) -> tuple:
+def prepare_inference_environment(config : OmegaConf) -> tuple:
     '''
     summary :
         추론을 위한 환경을 준비하는 함수로, 시드 설정, 클래스 매핑, 디바이스 설정을 수행합니다.
 
     args : 
-        configs : config 파일 경로 리스트
+        config : config 파일 경로
 
     return :
         tuple(device, 클래스-인덱스 매핑, 인덱스-클래스 매핑)
     '''
-    set_seed(configs.seed)
+    set_seed(config.seed)
     
-    CLASS2IND = {v: i for i, v in enumerate(configs[0].data.classes)}
+    CLASS2IND = {v: i for i, v in enumerate(config.data.classes)}
     IND2CLASS = {v: k for k, v in CLASS2IND.items()}
 
-    device = torch.device('cuda') if configs[0].inference.mode == 'gpu' else torch.device('cpu')
+    device = torch.device('cuda') if config.inference.mode == 'gpu' else torch.device('cpu')
     
     return device, CLASS2IND, IND2CLASS
 
