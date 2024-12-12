@@ -4,8 +4,8 @@ import wandb
 from omegaconf import OmegaConf
 from tqdm.auto import tqdm
 from Train.metrics.metrics import dice_coef
-from Model.utils.model_utils import get_model_output
-from Visualization.train_vis import visualize_predictions, save_image_for_visualization
+from models.utils.models_utils import get_model_output
+from visualization.train_vis import visualize_predictions, save_image_for_visualization
 
 
 def validation(model: torch.nn.Module, 

@@ -1,10 +1,10 @@
 import wandb
 import argparse
 from omegaconf import OmegaConf
-from Utils.set_seed import set_seed
-from Utils.config_utils import ConfigManager
-from Model.model import model_loader
-from Dataset.dataloader import get_train_val_loader
+from utils.set_seed import set_seed
+from utils.config_utils import ConfigManager
+from models.model import model_loader
+from data.dataloader import get_train_val_loader
 from Train.trainer import train
 from Train.loss.loss_opt_sche import loss_func_loader, lr_scheduler_loader, optimizer_loader
 

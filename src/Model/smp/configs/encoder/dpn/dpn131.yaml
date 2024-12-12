@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'dpn131'
-    encoder_weights: 'imagenet'
