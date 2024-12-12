@@ -6,19 +6,19 @@ import pandas as pd
 import pytz
 from datetime import datetime
 import torch
-from omegaconf import OmegaConf
+from omegaconf import DictConfig
 from data.dataloader import set_seed
 
 
-def prepare_inference_environment(config: OmegaConf) -> tuple:
+def prepare_inference_environment(config: DictConfig) -> tuple:
     '''
-    summary :
+    summary:
         추론을 위한 환경을 준비하는 함수로, 시드 설정, 클래스 매핑, 디바이스 설정을 수행합니다.
 
     args : 
-        config : config 파일 경로
+        config: 학습 및 모델 설정 객체.
 
-    return :
+    return:
         tuple(device, 클래스-인덱스 매핑, 인덱스-클래스 매핑)
     '''
     set_seed(config.seed)
@@ -33,13 +33,13 @@ def prepare_inference_environment(config: OmegaConf) -> tuple:
 
 def encode_mask_to_rle(mask: np.ndarray) -> str:
     '''
-    summary :
+    summary:
         마스크를 RLE(Run Length Encoding) 문자열로 인코딩합니다.
 
-    args : 
-        mask : 인코딩할 마스크 배열
+    args: 
+        mask: 인코딩할 마스크 배열
 
-    return :
+    return:
         RLE 인코딩된 문자열
     '''
     pixels = mask.flatten()
@@ -51,13 +51,13 @@ def encode_mask_to_rle(mask: np.ndarray) -> str:
 
 def encode_mask_to_rle_gpu(mask: torch.Tensor) -> str:
     '''
-    summary :
+    summary:
         GPU에서 마스크를 RLE 문자열로 인코딩합니다.
 
-    args : 
-        mask : 인코딩할 마스크 텐서
+    args: 
+        mask: 인코딩할 마스크 텐서
 
-    return :
+    return:
         RLE 인코딩된 문자열
     '''
     mask = mask.to(torch.uint8)
@@ -71,17 +71,17 @@ def encode_mask_to_rle_gpu(mask: torch.Tensor) -> str:
     return ' '.join(str(x) for x in runs)
 
 
-def decode_rle_to_mask(rle : str, height : int = 2048, width : int = 2048) -> np.ndarray:
+def decode_rle_to_mask(rle: str, height: int = 2048, width: int = 2048) -> np.ndarray:
     '''
-    summary :
+    summary:
         RLE 문자열을 마스크로 디코딩합니다.
 
-    args : 
-        rle : RLE 인코딩된 문자열
-        height : 마스크의 높이. 기본값은 2048.
-        width : 마스크의 너비. 기본값은 2048.
+    args: 
+        rle: RLE 인코딩된 문자열
+        height: 마스크의 높이. 기본값은 2048.
+        width: 마스크의 너비. 기본값은 2048.
 
-    return :
+    return:
         numpy.ndarray: 디코딩된 마스크 배열
     '''
     if not isinstance(rle, str) or len(rle.strip()) == 0:
@@ -100,18 +100,18 @@ def decode_rle_to_mask(rle : str, height : int = 2048, width : int = 2048) -> np
     return img
 
 
-def decode_rle_to_mask_gpu(rle : str, device : torch.device, height : int = 2048, width : int = 2048) -> torch.Tensor:
+def decode_rle_to_mask_gpu(rle: str, device: torch.device, height: int = 2048, width: int = 2048) -> torch.Tensor:
     '''
-    summary :
+    summary:
         GPU에서 RLE(Run Length Encoding) 문자열을 마스크로 디코딩합니다.
 
-    args : 
-        rle : RLE 인코딩된 문자열
-        device : 텐서를 로드할 디바이스
-        height : 마스크의 높이. 기본값은 2048.
-        width : 마스크의 너비. 기본값은 2048.
+    args: 
+        rle: RLE 인코딩된 문자열
+        device: 텐서를 로드할 디바이스
+        height: 마스크의 높이. 기본값은 2048.
+        width: 마스크의 너비. 기본값은 2048.
 
-    return :
+    return:
         디코딩된 마스크 텐서
     '''
     if not isinstance(rle, str) or len(rle.strip()) == 0:
@@ -133,16 +133,16 @@ def decode_rle_to_mask_gpu(rle : str, device : torch.device, height : int = 2048
     return mask
 
 
-def postprocessing_with_sharpening(mask : np.ndarray, threshold : float = 0.5) -> np.ndarray:
+def postprocessing_with_sharpening(mask: np.ndarray, threshold: float = 0.5) -> np.ndarray:
     '''
-    summary :
+    summary:
         OpenCV 기반의 샤프닝 및 후처리 함수로, 마스크의 품질을 향상시킵니다.
 
-    args : 
-        mask : 입력 마스크 배열
-        threshold : 이진화 임계값. 기본값은 0.5.
+    args: 
+        mask: 입력 마스크 배열
+        threshold: 이진화 임계값. 기본값은 0.5.
 
-    return :
+    return:
         후처리된 마스크 배열
     '''
     sharpening_kernel = np.array([[0, -1, 0],
@@ -158,17 +158,17 @@ def postprocessing_with_sharpening(mask : np.ndarray, threshold : float = 0.5) -
     return opened_mask
 
 
-def save_to_csv(filename_and_class : list, rles : list, cfg : OmegaConf):
+def save_to_csv(filename_and_class: list, rles: list, config: DictConfig):
     '''
-    summary :
+    summary:
         추론 결과를 CSV 파일로 저장합니다.
 
-    args : 
-        filename_and_class : 파일명과 클래스 정보의 리스트
-        rles : RLE 인코딩된 마스크 문자열 리스트
-        cfg : 설정 객체
+    args: 
+        filename_and_class: 파일명과 클래스 정보의 리스트
+        rles: RLE 인코딩된 마스크 문자열 리스트
+        cfg: 설정 객체
 
-    return :
+    return:
         저장된 CSV 파일의 경로
     '''
     os.makedirs(cfg.inference.output_dir, exist_ok=True)
