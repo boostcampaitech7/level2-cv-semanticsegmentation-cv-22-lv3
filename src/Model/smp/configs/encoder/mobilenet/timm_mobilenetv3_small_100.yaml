@@ -1,4 +1,0 @@
-model:
-  architecture:
-    encoder_name: 'timm-mobilenetv3_small_100'
-    encoder_weights: 'imagenet'

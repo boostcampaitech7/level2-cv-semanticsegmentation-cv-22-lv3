@@ -2,8 +2,10 @@ import numpy as np
 import pandas as pd
 from omegaconf import OmegaConf
 import os
+import os.path as osp
 import cv2
 import matplotlib.pyplot as plt
+
 
 config_path = ''
 csv_path = ''
@@ -54,7 +56,7 @@ def load_from_csv(csv_path):
 def find_image_path(folder, target_image_name):
     for root, dirs, files in os.walk(folder):
         if target_image_name in files:
-            return os.path.join(root, target_image_name)
+            return osp.join(root, target_image_name)
     return None
 
 
