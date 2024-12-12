@@ -1,0 +1,6 @@
+# config/model/transformer.yaml
+
+model_name: 'segformer'
+aux_loss: False
+encoder_name: 'nvidia/mit-b3'  # 또는 원하는 pretrained 모델 이름
+encoder_weights: 'imagenet'
