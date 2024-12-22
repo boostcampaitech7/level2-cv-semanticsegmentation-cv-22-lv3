@@ -1,0 +1,16 @@
+model:
+  module: 'segmentation_models_pytorch'
+  library: 'smp'
+  base_model: 'FPN'
+  architecture:
+    encoder_name: 'resnet34'
+    encoder_depth: 5  #[3, 5], default is 5
+    encoder_weights: 'imagenet'
+    decoder_pyramid_channels: 256
+    decoder_segmentation_channels: 128
+    decoder_merge_policy: 'add' # 'add', 'cat'
+    decoder_dropout: 0.2 # Spatial dropout rate in range (0, 1)
+    in_channels: 3
+    classes: 29
+    activation: null # “sigmoid”, “softmax”, “logsoftmax”, “tanh”, “identity”
+    upsampling: 4 # Final upsampling factor. Default is 4 to preserve input-output spatial shape identity

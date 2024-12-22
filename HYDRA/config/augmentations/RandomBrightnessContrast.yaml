@@ -1,0 +1,16 @@
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: RandomBrightnessContrast
+    params:
+      brightness_limit: 0.2
+      contrast_limit: 0.2
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+
