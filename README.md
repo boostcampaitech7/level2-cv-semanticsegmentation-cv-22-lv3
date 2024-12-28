@@ -158,5 +158,5 @@ UNet
 
 
 # 📞 문의
-김한별 : 2002bigstar@gmail.com  <br> 손지형 : sonji0988@gmail.com  <br> 유지환 : harwsare@yonsei.ac.kr  <br> 정승민 : taky0315@naver.com  <br> 조현준 : aaiss0927@gamil.com   <br>
+김한별 : 2002bigstar@gmail.com  <br> 손지형 : sonji0988@gmail.com  <br> 유지환 : hwan7919@gmail.com  <br> 정승민 : taky0315@naver.com  <br> 조현준 : aaiss0927@gamil.com   <br>
 
