@@ -1,0 +1,7 @@
+model:
+  module: 'torchvision.models.segmentation'
+  library: 'torchvision'
+  base_model: 'deeplabv3_resnet101'
+  architecture:
+    weights: 'DeepLabV3_ResNet101_Weights.DEFAULT'
+    progress: True

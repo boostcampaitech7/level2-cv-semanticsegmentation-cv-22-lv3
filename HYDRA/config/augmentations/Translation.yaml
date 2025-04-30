@@ -1,0 +1,19 @@
+# config/augmentations/Translation.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: ShiftScaleRotate
+    params:
+      shift_limit: 0.1
+      scale_limit: 0.1
+      rotate_limit: 0
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+

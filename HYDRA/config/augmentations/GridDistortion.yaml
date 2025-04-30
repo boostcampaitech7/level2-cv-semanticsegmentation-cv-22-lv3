@@ -1,0 +1,15 @@
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: GridDistortion
+    params:
+      num_steps: 5
+      distort_limit: 0.3
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512

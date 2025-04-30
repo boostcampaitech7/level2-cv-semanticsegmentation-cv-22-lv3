@@ -1,0 +1,14 @@
+model:
+  module: 'segmentation_models_pytorch'
+  library: "smp"
+  base_model: "Unet"
+  architecture:
+    encoder_name: "resnet34"
+    # encoder_depth: 5  # [3, 5], default is 5
+    encoder_weights: "imagenet"
+    decoder_use_batchnorm: True # True, False, "inplace"
+    # decoder_channels: (256, 128, 64, 32, 16)
+    decoder_attention_type: null # scse
+    in_channels: 3
+    classes: 29
+    activation: null # “sigmoid”, “softmax”, “logsoftmax”, “tanh”, “identity”

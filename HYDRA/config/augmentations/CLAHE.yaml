@@ -1,0 +1,18 @@
+# config/augmentations/CLAHE.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: CLAHE
+    params:
+      clip_limit: 2.0
+      tile_grid_size: [8, 8]
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+

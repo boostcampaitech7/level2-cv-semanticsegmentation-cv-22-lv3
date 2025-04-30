@@ -1,0 +1,4 @@
+model:
+  architecture:
+    encoder_name: 'resnet18'
+    encoder_weights: 'imagenet'

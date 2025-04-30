@@ -1,0 +1,16 @@
+# config/augmentations/Rotate.yaml
+
+train:
+  - type: Resize
+    params:
+      height: 512
+      width: 512
+  - type: Rotate
+    params:
+      limit: 30
+      p: 0.5
+val:
+  - type: Resize
+    params:
+      height: 512
+      width: 512

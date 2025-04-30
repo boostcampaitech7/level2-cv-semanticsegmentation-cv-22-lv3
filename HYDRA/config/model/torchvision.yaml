@@ -1,0 +1,10 @@
+# config/model/torchvision.yaml
+
+model_name: 'fcn_resnet101'  # torchvision 모델 이름 지정
+aux_loss: True                   # auxiliary loss 사용 여부
+
+# 손실 함수 설정
+criterion:
+  name: 'BCEWithLogitsLoss'  # torchvision 모델은 시그모이드가 아닌 로짓을 출력하므로 BCEWithLogitsLoss 사용
+
+# 기타 torchvision 모델에 특화된 설정 추가 가능

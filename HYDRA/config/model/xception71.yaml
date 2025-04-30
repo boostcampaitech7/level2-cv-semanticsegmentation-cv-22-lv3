@@ -1,0 +1,14 @@
+# config/model/SMP.yaml
+
+model_name: 'deeplabv3+'
+aux_loss: False
+encoder_name: 'tu-xception71'
+encoder_weights: 'imagenet'
+
+# Check usable encoders (timm)
+# Format example : encoder_name: "tu-vit_base_patch16_224" 
+# https://smp.readthedocs.io/en/latest/encoders_timm.html
+
+# Check usable encoders (SMP)
+# Format : encoder_name: 'vgg19'
+# https://smp.readthedocs.io/en/latest/encoders.html
